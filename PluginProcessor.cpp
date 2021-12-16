@@ -19,13 +19,43 @@ ExodusAudioProcessor::ExodusAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ),
+    tree_state(*this, nullptr, "PARAMETER", create_parameter_layout())
 #endif
 {
+    
 }
 
 ExodusAudioProcessor::~ExodusAudioProcessor()
 {
+}
+
+AudioProcessorValueTreeState::ParameterLayout ExodusAudioProcessor::create_parameter_layout()
+{
+    std::vector<std::unique_ptr<RangedAudioParameter>> parameters;
+
+    parameters.push_back(std::move(std::make_unique<AudioParameterFloat>("m_input_gain_id", "m_input_gain_name", -60.0, 6.0, 0.0)));
+    parameters.push_back(std::move(std::make_unique<AudioParameterFloat>("m_output_gain_id", "m_output_gain_name", -60.0, 6.0, 0.0)));
+    parameters.push_back(std::move(std::make_unique<AudioParameterFloat>("m_delay_time_id", "m_delay_time_name", 40.0, 1500.0, 250.0)));
+    parameters.push_back(std::move(std::make_unique<AudioParameterFloat>("m_delay_feedback_id", "m_delay_feedback_name", 0.0, 0.85, 0.5)));
+    /*for (int i = 0; i < NUM_OF_INSTENCES; i++)
+    {
+        std::string vol_dial_id = "m_vol_dial_id_" + i;
+        std::string vol_dial_name = "m_vol_dial_name_" + i;
+        parameters.push_back(std::move(std::make_unique<AudioParameterFloat>(vol_dial_id, vol_dial_name, 0.0, 1.0, 0.5)));
+        std::string pan_dial_id = "m_pan_dial_id_" + i;
+        std::string pan_dial_name = "m_pan_dial_name_" + i;
+        parameters.push_back(std::move(std::make_unique<AudioParameterFloat>(pan_dial_id, pan_dial_name, -1.0, 1.0, 0.0)));
+        std::string on_off_dial_id = "m_on_off_dial_id_" + i;
+        std::string on_off_dial_name = "m_on_off_dial_name_" + i;
+        parameters.push_back(std::move(std::make_unique<AudioParameterFloat>(on_off_dial_id, on_off_dial_name, false, true, false)));
+        std::string reverb_dial_id = "m_reverb_dial_id_" + i;
+        std::string reverb_dial_name = "m_reverb_dial_name_" + i;
+        parameters.push_back(std::move(std::make_unique<AudioParameterFloat>(reverb_dial_id, reverb_dial_name, false, true, false)));
+    }*/
+
+
+    return { parameters.begin(), parameters.end() };
 }
 
 //==============================================================================

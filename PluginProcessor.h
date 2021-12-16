@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "MyDelay.h"
 
 //==============================================================================
 /**
@@ -52,6 +53,12 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+
+    juce::AudioProcessorValueTreeState tree_state;
+    AudioProcessorValueTreeState::ParameterLayout create_parameter_layout();
+
+    int marked;
+
 
 private:
     //==============================================================================
