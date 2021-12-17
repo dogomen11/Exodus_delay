@@ -23,7 +23,6 @@ ExodusAudioProcessor::ExodusAudioProcessor()
     tree_state(*this, nullptr, "PARAMETER", create_parameter_layout())
 #endif
 {
-    
 }
 
 ExodusAudioProcessor::~ExodusAudioProcessor()
@@ -32,37 +31,37 @@ ExodusAudioProcessor::~ExodusAudioProcessor()
 
 AudioProcessorValueTreeState::ParameterLayout ExodusAudioProcessor::create_parameter_layout()
 {
-    std::vector<std::unique_ptr<RangedAudioParameter>> parameters;
+    juce::AudioProcessorValueTreeState::ParameterLayout parameters;
 
-    parameters.push_back(std::move(std::make_unique<AudioParameterFloat>("m_input_gain_id", "m_input_gain_name", -60.0, 6.0, 0.0)));
-    parameters.push_back(std::move(std::make_unique<AudioParameterFloat>("m_output_gain_id", "m_output_gain_name", -60.0, 6.0, 0.0)));
-    parameters.push_back(std::move(std::make_unique<AudioParameterFloat>("m_delay_time_id", "m_delay_time_name", 0.0, 1500.0, 500.0)));
-    parameters.push_back(std::move(std::make_unique<AudioParameterFloat>("m_delay_feedback_id", "m_delay_feedback_name", 0.0, 0.84, 0.42)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_input_gain_id", "m_input_gain_name", NormalisableRange<float>(-60.0, 6.0, 1.0), 0.0)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_output_gain_id", "m_output_gain_name", NormalisableRange<float>(-60.0, 6.0, 1.0), 0.0)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_delay_time_id", "m_delay_time_name", NormalisableRange<float>(0.0, 1500.0, 1.0), 400.0)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_delay_feedback_id", "m_delay_feedback_name", NormalisableRange<float>(0.0, 0.84, 0.01), 0.42)));
     for (int i = 0; i < NUM_OF_INSTENCES; i++)
     {
         std::string vol_dial_id = "m_vol_dial_id_";
         vol_dial_id.append(to_string(i));
         std::string vol_dial_name = "m_vol_dial_name_";
         vol_dial_name.append(to_string(i));
-        parameters.push_back(std::move(std::make_unique<AudioParameterFloat>(vol_dial_id, vol_dial_name, 0.0, 1.5, 1.0)));
+        parameters.add((std::make_unique<AudioParameterFloat>(vol_dial_id, vol_dial_name, NormalisableRange<float>(0.0, 1.5, 0.01), 1.0)));
         std::string pan_dial_id = "m_pan_dial_id_";
         pan_dial_id.append(to_string(i));
         std::string pan_dial_name = "m_pan_dial_name_";
         pan_dial_name.append(to_string(i));
-        parameters.push_back(std::move(std::make_unique<AudioParameterFloat>(pan_dial_id, pan_dial_name, -1.0, 1.0, 0.0)));
+        parameters.add((std::make_unique<AudioParameterFloat>(pan_dial_id, pan_dial_name, NormalisableRange<float>(-1.0, 1.0, 0.01), 0.0)));
         std::string on_off_button_id = "m_on_off_button_id_";
         on_off_button_id.append(to_string(i));
         std::string on_off_button_name = "m_on_off_button_name_";
         on_off_button_name.append(to_string(i));
-        parameters.push_back(std::move(std::make_unique<AudioParameterFloat>(on_off_button_id, on_off_button_name, false, true, false)));
+        parameters.add((std::make_unique<AudioParameterBool>(on_off_button_id, on_off_button_name, false)));
         std::string reverb_button_id = "m_reverb_button_id_";
         reverb_button_id.append(to_string(i));
         std::string reverb_button_name = "m_reverb_button_name_";
         reverb_button_name.append(to_string(i));
-        parameters.push_back(std::move(std::make_unique<AudioParameterFloat>(reverb_button_id, reverb_button_name, false, true, false)));
+        parameters.add((std::make_unique<AudioParameterBool>(reverb_button_id, reverb_button_name, false)));
     }
 
-    return { parameters.begin(), parameters.end() };
+    return  parameters;
 }
 
 //==============================================================================
@@ -180,8 +179,9 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
         auto* channelData = buffer.getWritePointer (channel);
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
         {
-            auto current_gain = juce::Decibels::decibelsToGain(tree_state.getRawParameterValue("input_gain_id")->load());
-            channelData[sample] = channelData[sample] * current_gain;
+            //AudioParameterFloat degug = tree_state.getRawParameterValue("m_input_gain_id")->load();
+           // auto current_gain = juce::Decibels::decibelsToGain();
+            //channelData[sample] = channelData[sample] * current_gain;
         }
 
     }
