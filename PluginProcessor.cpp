@@ -36,24 +36,31 @@ AudioProcessorValueTreeState::ParameterLayout ExodusAudioProcessor::create_param
 
     parameters.push_back(std::move(std::make_unique<AudioParameterFloat>("m_input_gain_id", "m_input_gain_name", -60.0, 6.0, 0.0)));
     parameters.push_back(std::move(std::make_unique<AudioParameterFloat>("m_output_gain_id", "m_output_gain_name", -60.0, 6.0, 0.0)));
-    parameters.push_back(std::move(std::make_unique<AudioParameterFloat>("m_delay_time_id", "m_delay_time_name", 40.0, 1500.0, 250.0)));
-    parameters.push_back(std::move(std::make_unique<AudioParameterFloat>("m_delay_feedback_id", "m_delay_feedback_name", 0.0, 0.85, 0.5)));
-    /*for (int i = 0; i < NUM_OF_INSTENCES; i++)
+    parameters.push_back(std::move(std::make_unique<AudioParameterFloat>("m_delay_time_id", "m_delay_time_name", 0.0, 1500.0, 500.0)));
+    parameters.push_back(std::move(std::make_unique<AudioParameterFloat>("m_delay_feedback_id", "m_delay_feedback_name", 0.0, 0.84, 0.42)));
+    for (int i = 0; i < NUM_OF_INSTENCES; i++)
     {
-        std::string vol_dial_id = "m_vol_dial_id_" + i;
-        std::string vol_dial_name = "m_vol_dial_name_" + i;
-        parameters.push_back(std::move(std::make_unique<AudioParameterFloat>(vol_dial_id, vol_dial_name, 0.0, 1.0, 0.5)));
-        std::string pan_dial_id = "m_pan_dial_id_" + i;
-        std::string pan_dial_name = "m_pan_dial_name_" + i;
+        std::string vol_dial_id = "m_vol_dial_id_";
+        vol_dial_id.append(to_string(i));
+        std::string vol_dial_name = "m_vol_dial_name_";
+        vol_dial_name.append(to_string(i));
+        parameters.push_back(std::move(std::make_unique<AudioParameterFloat>(vol_dial_id, vol_dial_name, 0.0, 1.5, 1.0)));
+        std::string pan_dial_id = "m_pan_dial_id_";
+        pan_dial_id.append(to_string(i));
+        std::string pan_dial_name = "m_pan_dial_name_";
+        pan_dial_name.append(to_string(i));
         parameters.push_back(std::move(std::make_unique<AudioParameterFloat>(pan_dial_id, pan_dial_name, -1.0, 1.0, 0.0)));
-        std::string on_off_dial_id = "m_on_off_dial_id_" + i;
-        std::string on_off_dial_name = "m_on_off_dial_name_" + i;
-        parameters.push_back(std::move(std::make_unique<AudioParameterFloat>(on_off_dial_id, on_off_dial_name, false, true, false)));
-        std::string reverb_dial_id = "m_reverb_dial_id_" + i;
-        std::string reverb_dial_name = "m_reverb_dial_name_" + i;
-        parameters.push_back(std::move(std::make_unique<AudioParameterFloat>(reverb_dial_id, reverb_dial_name, false, true, false)));
-    }*/
-
+        std::string on_off_button_id = "m_on_off_button_id_";
+        on_off_button_id.append(to_string(i));
+        std::string on_off_button_name = "m_on_off_button_name_";
+        on_off_button_name.append(to_string(i));
+        parameters.push_back(std::move(std::make_unique<AudioParameterFloat>(on_off_button_id, on_off_button_name, false, true, false)));
+        std::string reverb_button_id = "m_reverb_button_id_";
+        reverb_button_id.append(to_string(i));
+        std::string reverb_button_name = "m_reverb_button_name_";
+        reverb_button_name.append(to_string(i));
+        parameters.push_back(std::move(std::make_unique<AudioParameterFloat>(reverb_button_id, reverb_button_name, false, true, false)));
+    }
 
     return { parameters.begin(), parameters.end() };
 }
@@ -123,8 +130,8 @@ void ExodusAudioProcessor::changeProgramName (int index, const juce::String& new
 //==============================================================================
 void ExodusAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    m_visualiser.clear();
+
 }
 
 void ExodusAudioProcessor::releaseResources()
@@ -165,27 +172,20 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
+        for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
+        {
+            auto current_gain = juce::Decibels::decibelsToGain(tree_state.getRawParameterValue("input_gain_id")->load());
+            channelData[sample] = channelData[sample] * current_gain;
+        }
 
-        // ..do something to the data...
     }
+    m_visualiser.pushBuffer(buffer);
 }
 
 //==============================================================================

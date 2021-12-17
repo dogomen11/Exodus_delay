@@ -16,13 +16,15 @@ using namespace std;
 //==============================================================================
 /**
 */
-class ExodusAudioProcessorEditor  : public juce::AudioProcessorEditor
+class ExodusAudioProcessorEditor :  public juce::AudioProcessorEditor
+                                    
 {
 public:
     ExodusAudioProcessorEditor (ExodusAudioProcessor&);
     ~ExodusAudioProcessorEditor() override;
 
-    //==============================================================================
+    //void juce::Slider::Listener::sliderValueChanged(Slider* slider);
+    //void juce::Button::Listener::buttonClicked(Button*) override;
     void initiateComponents(AudioProcessor&);
     void printComponents();
     void paint (juce::Graphics&) override;

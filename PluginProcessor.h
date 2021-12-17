@@ -57,7 +57,19 @@ public:
     juce::AudioProcessorValueTreeState tree_state;
     AudioProcessorValueTreeState::ParameterLayout create_parameter_layout();
 
-    int marked;
+    class Visualiser : public AudioVisualiserComponent
+    {
+    public:
+        Visualiser() : AudioVisualiserComponent(2)
+        {
+            setBufferSize(512);
+            setSamplesPerBlock(64);
+            setColours(Colours::black, Colours::darkred);
+        }
+    };
+    Visualiser m_visualiser;
+
+    int marked; //TODO insert to MyDelay class
 
 
 private:
