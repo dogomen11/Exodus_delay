@@ -16,25 +16,24 @@
 ExodusAudioProcessorEditor::ExodusAudioProcessorEditor (ExodusAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-    silder_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_input_gain_id", m_input_gain);
-    silder_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_output_gain_id", m_output_gain);
-    silder_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_delay_time_id", m_delay_time);
-    silder_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_delay_feedback_id", m_delay_feedback);
-    
+    m_input_gain_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_input_gain_id", m_input_gain);
+    m_output_gain_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_output_gain_id", m_output_gain);
+    m_delay_time_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_delay_time_id", m_delay_time);
+    m_delay_feedback_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_delay_feedback_id", m_delay_feedback);
     for (int i = 0; i < NUM_OF_INSTENCES; i++)
     {
         std::string vol_dial_id = "m_vol_dial_id_";
         vol_dial_id.append(to_string(i));
-        silder_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, vol_dial_id, m_volume_dials[i]);
+        m_volume_dials_attach[i] = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, vol_dial_id, m_volume_dials[i]);
         std::string pan_dial_id = "m_pan_dial_id_";
         pan_dial_id.append(to_string(i));
-        silder_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, pan_dial_id, m_pan_dials[i]);
+        m_pan_dials_attach[i] = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, pan_dial_id, m_pan_dials[i]);
         std::string on_off_button_id = "m_on_off_button_id_";
         on_off_button_id.append(to_string(i));
-        button_attach = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.tree_state, on_off_button_id, m_on_off_buttons[i]);
+        m_on_off_buttons_attach[i] = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.tree_state, on_off_button_id, m_on_off_buttons[i]);
         std::string reverb_button_id = "m_reverb_button_id_";
         reverb_button_id.append(to_string(i));
-        button_attach = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.tree_state, reverb_button_id, m_reverb_buttons[i]);
+        m_reverb_buttons_attach[i] = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.tree_state, reverb_button_id, m_reverb_buttons[i]);
     }
     
     setSize (1200, 800);

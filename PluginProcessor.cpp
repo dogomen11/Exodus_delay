@@ -174,14 +174,13 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
+    float current_input_gain = tree_state.getRawParameterValue("m_input_gain_id")->load();
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
         {
-            //AudioParameterFloat degug = tree_state.getRawParameterValue("m_input_gain_id")->load();
-           // auto current_gain = juce::Decibels::decibelsToGain();
-            //channelData[sample] = channelData[sample] * current_gain;
+            channelData[sample] = channelData[sample] * juce::Decibels::decibelsToGain(current_input_gain);
         }
 
     }

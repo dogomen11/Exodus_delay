@@ -23,8 +23,6 @@ public:
     ExodusAudioProcessorEditor (ExodusAudioProcessor&);
     ~ExodusAudioProcessorEditor() override;
 
-    //void juce::Slider::Listener::sliderValueChanged(Slider* slider);
-    //void juce::Button::Listener::buttonClicked(Button*) override;
     void initiateComponents(AudioProcessor&);
     void printComponents();
     void paint (juce::Graphics&) override;
@@ -58,8 +56,14 @@ private:
  
 public:
 
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> silder_attach;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> button_attach;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_input_gain_attach;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_output_gain_attach;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_delay_time_attach;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_delay_feedback_attach;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_volume_dials_attach[NUM_OF_INSTENCES];
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_pan_dials_attach[NUM_OF_INSTENCES];
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> m_on_off_buttons_attach[NUM_OF_INSTENCES];
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> m_reverb_buttons_attach[NUM_OF_INSTENCES];
 
     ExodusAudioProcessor& audioProcessor;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ExodusAudioProcessorEditor)
