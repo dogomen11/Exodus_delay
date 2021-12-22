@@ -131,8 +131,6 @@ void ExodusAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
 {
     m_visualiser.clear();
     m_visualiser_2.clear();
-    m_visualiser_2.setColours(Colours::black, Colours::indianred);
-
 }
 
 void ExodusAudioProcessor::releaseResources()
@@ -176,15 +174,23 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    m_visualiser.pushBuffer(buffer);
 
-    float current_input_gain = tree_state.getRawParameterValue("m_input_gain_id")->load();
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
         {
-            channelData[sample] = channelData[sample] * juce::Decibels::decibelsToGain(current_input_gain);
+            channelData[sample] = channelData[sample] * juce::Decibels::decibelsToGain(tree_state.getRawParameterValue("m_input_gain_id")->load());
+        }
+    }
+    m_visualiser.pushBuffer(buffer);
+
+    for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    {
+        auto* channelData = buffer.getWritePointer(channel);
+        for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
+        {
+            channelData[sample] = channelData[sample] * juce::Decibels::decibelsToGain(tree_state.getRawParameterValue("m_output_gain_id")->load());
         }
     }
     m_visualiser_2.pushBuffer(buffer);
