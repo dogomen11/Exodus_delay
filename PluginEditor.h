@@ -16,13 +16,16 @@ using namespace std;
 //==============================================================================
 /**
 */
-class ExodusAudioProcessorEditor :  public juce::AudioProcessorEditor
+class ExodusAudioProcessorEditor :  public juce::AudioProcessorEditor,
+                                    public juce::Button::Listener
                                     
 {
 public:
     ExodusAudioProcessorEditor (ExodusAudioProcessor&);
     ~ExodusAudioProcessorEditor() override;
 
+    void juce::Button::Listener::buttonClicked(Button*) override;
+    void reAlphaComponents();
     void initiateComponents(AudioProcessor&);
     void printComponents();
     void paint (juce::Graphics&) override;
@@ -52,8 +55,7 @@ private:
 
     ImageComponent m_background;
 
-    void reAlphaComponents();
- 
+
 public:
 
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_input_gain_attach;

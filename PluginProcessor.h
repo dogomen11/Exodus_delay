@@ -69,7 +69,8 @@ public:
     };
     Visualiser m_visualiser;
     Visualiser m_visualiser_2;
-    int marked; //TODO insert to MyDelay class
+
+    MyDelay delay;
 
 
 private:

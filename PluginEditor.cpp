@@ -16,6 +16,7 @@
 ExodusAudioProcessorEditor::ExodusAudioProcessorEditor (ExodusAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
+    m_reverb_buttons[0].addMouseListener(&m_reverb_buttons[0], true);
     m_input_gain_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_input_gain_id", m_input_gain);
     m_output_gain_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_output_gain_id", m_output_gain);
     m_delay_time_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_delay_time_id", m_delay_time);
@@ -41,17 +42,42 @@ ExodusAudioProcessorEditor::ExodusAudioProcessorEditor (ExodusAudioProcessor& p)
 }
 
 
-
 ExodusAudioProcessorEditor::~ExodusAudioProcessorEditor()
 {
 }
 
 
+void ExodusAudioProcessorEditor::buttonClicked(Button* button)
+{
+    for (int i = 0; i < 16; i++)
+    {
+        if (button == &m_on_off_buttons[i])
+        {
+            audioProcessor.delay.d_on_off[i] = m_on_off_buttons[i].getToggleState();
+            switch (m_on_off_buttons[i].getToggleState())
+            {
+            case true:
+                audioProcessor.delay.addMark(i);
+                break;
+            case false:
+                audioProcessor.delay.subMark(i);
+                break;
+            }
+        }
+        else if (button == &m_reverb_buttons[i])
+        {
+            audioProcessor.delay.d_reverb[i] = m_reverb_buttons[i].getToggleState();
+        }
+    }
+    reAlphaComponents();
+
+}
+
 void ExodusAudioProcessorEditor::reAlphaComponents()
 {
     for (int i = 0; i < 16; i++)
     {
-        if (audioProcessor.marked == 0)
+        if (audioProcessor.delay.getMarked() == 0)
         {
             m_volume_dials[i].setAlpha(TRANSPARENT);
             m_pan_dials[i].setAlpha(TRANSPARENT);
@@ -164,7 +190,7 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
         m_volume_dials[i].setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
         //m_volume_dials[i].addListener(this);
         m_volume_dials[i].setOpaque(false);
-        if (audioProcessor.marked == 0) { m_volume_dials[i].setAlpha(TRANSPARENT); }
+        if (audioProcessor.delay.getMarked() == 0) { m_volume_dials[i].setAlpha(TRANSPARENT); }
 
         addAndMakeVisible(m_pan_dials[i]);
         m_pan_dials[i].setRange(-1.0f, 1.0f, 0.01f);
@@ -173,13 +199,13 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
         m_pan_dials[i].setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
         //m_pan_dials[i].addListener(this);
         m_pan_dials[i].setOpaque(false);
-        if (audioProcessor.marked == 0) { m_pan_dials[i].setAlpha(TRANSPARENT); }
+        if (audioProcessor.delay.getMarked() == 0) { m_pan_dials[i].setAlpha(TRANSPARENT); }
 
         addAndMakeVisible(m_on_off_buttons[i]);
-        //m_on_off_buttons[i].addListener(this);
+        m_on_off_buttons[i].addListener(this);
 
         addAndMakeVisible(m_reverb_buttons[i]);
-        //m_reverb_buttons[i].addListener(this);
+        m_reverb_buttons[i].addListener(this);
     }
 
 
