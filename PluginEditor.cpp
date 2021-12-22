@@ -46,68 +46,7 @@ ExodusAudioProcessorEditor::~ExodusAudioProcessorEditor()
 {
 }
 
-/*
-void ExodusAudioProcessorEditor::sliderValueChanged(juce::Slider* slider)
-{
-    if (slider == &m_input_gain)
-    {
-        audioProcessor.m_input_gain = m_input_gain.getValue();
-    }
-    else if (slider == &m_output_gain)
-    {
-        audioProcessor.m_output_gain = m_output_gain.getValue();
-    }
-    else if (slider == &m_delay_time)
-    {
-        audioProcessor.m_delay_time = m_delay_time.getValue();
-    }
-    else if (slider == &m_delay_feedback)
-    {
-        audioProcessor.m_delay_feedback = m_delay_feedback.getValue();
-    }
-    else
-    {
-        for (int i = 0; i < 16; i++)
-        {
-            if (slider == &m_volume_dials[i])
-            {
-                audioProcessor.m_volume_dials[i] = m_volume_dials[i].getValue();
-            }
-            if (slider == &m_pan_dials[i])
-            {
-                audioProcessor.m_pan_dials[i] = m_pan_dials[i].getValue();
-            }
-        }
-    }
-}
 
-void ExodusAudioProcessorEditor::buttonClicked(Button* button)
-{
-    DBG("clicked");
-    for (int i = 0; i < 16; i++)
-    {
-        if (button == &m_on_off_buttons[i])
-        {
-            audioProcessor.m_on_off_button_array[i] = m_on_off_buttons[i].getToggleState();
-            switch (m_on_off_buttons[i].getToggleState())
-            {
-            case true:
-                audioProcessor.marked++;
-                break;
-            case false:
-                audioProcessor.marked--;
-                break;
-            }
-        }
-        else if (button == &m_reverb_buttons[i])
-        {
-            audioProcessor.m_reverb_button_array[i] = m_reverb_buttons[i].getToggleState();
-        }
-    }
-    reAlphaComponents();
-
-}
-*/
 void ExodusAudioProcessorEditor::reAlphaComponents()
 {
     for (int i = 0; i < 16; i++)
@@ -167,7 +106,9 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
     m_on_off_buttons_label.setText("on/off", juce::dontSendNotification);
     addAndMakeVisible(m_reverb_buttons_label);
     m_reverb_buttons_label.setText("reverb", juce::dontSendNotification);
+
     addAndMakeVisible(this->audioProcessor.m_visualiser);
+    addAndMakeVisible(this->audioProcessor.m_visualiser_2);
 
     addAndMakeVisible(m_background);
     //*****************************************************************************
@@ -264,7 +205,8 @@ void ExodusAudioProcessorEditor::printComponents()
     m_delay_time_label.setBounds(120, 735, 90, 30);
     m_delay_feedback.setBounds(400, 710, 90, 90);
     m_delay_feedback_label.setBounds(320, 735, 90, 30);
-    audioProcessor.m_visualiser.setBounds(110, 45, 680, 290);
+    audioProcessor.m_visualiser.setBounds(25, 100, 600, 280);
+    audioProcessor.m_visualiser_2.setBounds(635, 100, 600, 280);
     for (int i = 0; i < 16; i++)
     {
         m_pan_dials[i].setBounds(dials_distance_from_edeg + (dials_horizontal_distance * i), 430, size_of_dial, size_of_dial);
