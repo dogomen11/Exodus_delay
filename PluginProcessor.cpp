@@ -20,13 +20,16 @@ ExodusAudioProcessor::ExodusAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        ),
-    tree_state(*this, nullptr, "PARAMETER", create_parameter_layout())
+                    tree_state(*this, nullptr, "PARAMETER", create_parameter_layout()),
+                    delay()
 #endif
 {
+    Timer::startTimerHz(1);
 }
 
 ExodusAudioProcessor::~ExodusAudioProcessor()
 {
+    Timer::stopTimer();
 }
 
 AudioProcessorValueTreeState::ParameterLayout ExodusAudioProcessor::create_parameter_layout()
@@ -62,6 +65,19 @@ AudioProcessorValueTreeState::ParameterLayout ExodusAudioProcessor::create_param
     }
 
     return  parameters;
+}
+
+void ExodusAudioProcessor::promoteInstence()
+{
+    current_instence++;
+    current_instence %= NUM_OF_INSTENCES;
+}
+
+
+void ExodusAudioProcessor::timerCallback()
+{
+    promoteInstence();
+    // TODO: add mroe options
 }
 
 //==============================================================================
@@ -131,6 +147,9 @@ void ExodusAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
 {
     m_visualiser.clear();
     m_visualiser_2.clear();
+
+    delay.setSize(getNumInputChannels(), sampleRate * samplesPerBlock * 2);
+    delay.setSampleRate(sampleRate);
 }
 
 void ExodusAudioProcessor::releaseResources()
@@ -174,6 +193,7 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
+    int buffer_length = buffer.getNumSamples();
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
@@ -181,6 +201,13 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
         {
             channelData[sample] = channelData[sample] * juce::Decibels::decibelsToGain(tree_state.getRawParameterValue("m_input_gain_id")->load());
+        }
+
+        if (delay.getMarked() == 0)
+        {
+            const float* buffer_data = buffer.getReadPointer(channel);
+            delay.fillDelayBuffer(channel, buffer_length, buffer_data, processor_buffer_write_pos);
+            delay.getFromDelayBuffer(buffer, channel, buffer_length, delay.getNumSamples(), processor_buffer_write_pos);
         }
     }
     m_visualiser.pushBuffer(buffer);
@@ -194,7 +221,12 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
         }
     }
     m_visualiser_2.pushBuffer(buffer);
+
+    processor_buffer_write_pos += buffer_length;
+    processor_buffer_write_pos %= delay.getNumSamples();
 }
+
+
 
 //==============================================================================
 bool ExodusAudioProcessor::hasEditor() const

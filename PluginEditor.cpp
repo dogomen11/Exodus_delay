@@ -203,9 +203,11 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
 
         addAndMakeVisible(m_on_off_buttons[i]);
         m_on_off_buttons[i].addListener(this);
+        if (audioProcessor.delay.getMarked() == 0) { m_on_off_buttons[i].setAlpha(TRANSPARENT); }
 
         addAndMakeVisible(m_reverb_buttons[i]);
         m_reverb_buttons[i].addListener(this);
+        if (audioProcessor.delay.getMarked() == 0) { m_reverb_buttons[i].setAlpha(TRANSPARENT); }
     }
 
 
