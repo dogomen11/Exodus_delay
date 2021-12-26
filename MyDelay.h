@@ -42,6 +42,7 @@ class MyDelay
         void addMark(int instence);
         void subMark(int instence);
         int getNumSamples() { return delay_buffer.getNumSamples(); }
+        float getDelayTime() { return delay_time; }
 };
 
 #endif // MY_DELAY

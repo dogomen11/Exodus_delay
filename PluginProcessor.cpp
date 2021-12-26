@@ -24,12 +24,10 @@ ExodusAudioProcessor::ExodusAudioProcessor()
                     delay()
 #endif
 {
-    Timer::startTimerHz(1);
 }
 
 ExodusAudioProcessor::~ExodusAudioProcessor()
 {
-    Timer::stopTimer();
 }
 
 AudioProcessorValueTreeState::ParameterLayout ExodusAudioProcessor::create_parameter_layout()
@@ -71,13 +69,6 @@ void ExodusAudioProcessor::promoteInstence()
 {
     current_instence++;
     current_instence %= NUM_OF_INSTENCES;
-}
-
-
-void ExodusAudioProcessor::timerCallback()
-{
-    promoteInstence();
-    // TODO: add mroe options
 }
 
 //==============================================================================
@@ -205,9 +196,9 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
 
         if (delay.getMarked() == 0)
         {
-            const float* buffer_data = buffer.getReadPointer(channel);
-            delay.fillDelayBuffer(channel, buffer_length, buffer_data, processor_buffer_write_pos);
-            delay.getFromDelayBuffer(buffer, channel, buffer_length, delay.getNumSamples(), processor_buffer_write_pos);
+            //const float* buffer_data = buffer.getReadPointer(channel);
+            //delay.fillDelayBuffer(channel, buffer_length, buffer_data, processor_buffer_write_pos);
+            //delay.getFromDelayBuffer(buffer, channel, buffer_length, delay.getNumSamples(), processor_buffer_write_pos);
         }
     }
     m_visualiser.pushBuffer(buffer);

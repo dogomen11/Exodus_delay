@@ -14,8 +14,7 @@
 //==============================================================================
 /**
 */
-class ExodusAudioProcessor  : public juce::AudioProcessor,
-                              public juce::Timer
+class ExodusAudioProcessor  : public juce::AudioProcessor
 {
 public:
     //==============================================================================
@@ -70,7 +69,6 @@ public:
     };
     Visualiser m_visualiser;
     Visualiser m_visualiser_2;
-    void timerCallback() override;
     MyDelay delay;
     int current_instence = 0;
     void promoteInstence();

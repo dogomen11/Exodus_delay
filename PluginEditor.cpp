@@ -14,7 +14,7 @@
 
 //==============================================================================
 ExodusAudioProcessorEditor::ExodusAudioProcessorEditor (ExodusAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+    : AudioProcessorEditor (&p), audioProcessor (p), ti_instence()
 {
     m_reverb_buttons[0].addMouseListener(&m_reverb_buttons[0], true);
     m_input_gain_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_input_gain_id", m_input_gain);
@@ -36,7 +36,7 @@ ExodusAudioProcessorEditor::ExodusAudioProcessorEditor (ExodusAudioProcessor& p)
         reverb_button_id.append(to_string(i));
         m_reverb_buttons_attach[i] = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.tree_state, reverb_button_id, m_reverb_buttons[i]);
     }
-    
+    startTimerHz(5);
     setSize (1200, 800);
     initiateComponents(p);
 }
@@ -44,8 +44,17 @@ ExodusAudioProcessorEditor::ExodusAudioProcessorEditor (ExodusAudioProcessor& p)
 
 ExodusAudioProcessorEditor::~ExodusAudioProcessorEditor()
 {
+    stopTimer();
 }
 
+void ExodusAudioProcessorEditor::timerCallback()
+{
+    audioProcessor.promoteInstence();
+    //indicator_debug.setBounds((84 + 64 * audioProcessor.current_instence), 650, 20, 20);
+    stopTimer();
+    startTimer(audioProcessor.delay.getDelayTime()/100);
+    // TODO: add mroe options
+}
 
 void ExodusAudioProcessorEditor::buttonClicked(Button* button)
 {
@@ -209,7 +218,8 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
         m_reverb_buttons[i].addListener(this);
         if (audioProcessor.delay.getMarked() == 0) { m_reverb_buttons[i].setAlpha(TRANSPARENT); }
     }
-
+    addAndMakeVisible(ti_instence);
+    addAndMakeVisible(indicator_debug);
 
 }
 
@@ -242,7 +252,8 @@ void ExodusAudioProcessorEditor::printComponents()
         m_on_off_buttons[i].setBounds(16 + dials_distance_from_edeg + dials_horizontal_distance * i, 570, size_of_dial, size_of_dial);
         m_reverb_buttons[i].setBounds(16 + dials_distance_from_edeg + dials_horizontal_distance * i, 620, size_of_dial, size_of_dial);
     }
-
+    ti_instence.setBounds((84 + 64 * audioProcessor.current_instence), 650, 20, 20);
+    indicator_debug.setBounds((84 + 64 * audioProcessor.current_instence), 650, 20, 20);
 }
 
 void ExodusAudioProcessorEditor::resized()
