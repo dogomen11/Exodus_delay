@@ -219,6 +219,7 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
     }
     addAndMakeVisible(ti_instence);
     addAndMakeVisible(indicator_debug);
+    
 
 }
 

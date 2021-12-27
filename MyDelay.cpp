@@ -15,7 +15,7 @@ float calculatePanMargin(float pan, int channel);
 MyDelay::MyDelay() : delay_buffer(),
                      marked(0)
 {
-
+    delay_buffer.clear();
 }
 
 
@@ -49,11 +49,12 @@ void MyDelay::fillDelayBuffer(int channel, const int buffer_length, const float*
 
 void MyDelay::getFromDelayBuffer(AudioBuffer<float>& buffer, int channel, const int buffer_length, const int delay_buffer_length, int buffer_write_position)
 {
+    jassert(delay_buffer.getArrayOfReadPointers() != nullptr);
     const int read_position = static_cast<int> (delay_buffer_length + buffer_write_position - (sample_rate * delay_time / 1000)) % delay_buffer_length;
     const float* delay_buffer_data = delay_buffer.getReadPointer(channel);
     if (delay_buffer_length > buffer_length + read_position)
     {
-        buffer.addFrom(channel, 0, delay_buffer.getReadPointer(channel) + read_position, buffer_length);
+        buffer.addFrom(channel, 0, delay_buffer_data + read_position, buffer_length);
     }
     else
     {

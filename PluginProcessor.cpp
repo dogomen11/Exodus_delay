@@ -196,7 +196,7 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
 
         if (delay.getMarked() == 0)
         {
-            //const float* buffer_data = buffer.getReadPointer(channel);
+            const float* buffer_data = buffer.getReadPointer(channel);
             //delay.fillDelayBuffer(channel, buffer_length, buffer_data, processor_buffer_write_pos);
             //delay.getFromDelayBuffer(buffer, channel, buffer_length, delay.getNumSamples(), processor_buffer_write_pos);
         }
