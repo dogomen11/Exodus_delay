@@ -36,7 +36,7 @@ ExodusAudioProcessorEditor::ExodusAudioProcessorEditor (ExodusAudioProcessor& p)
         reverb_button_id.append(to_string(i));
         m_reverb_buttons_attach[i] = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.tree_state, reverb_button_id, m_reverb_buttons[i]);
     }
-    startTimerHz(5);
+    startTimerHz(*audioProcessor.tree_state.getRawParameterValue("m_delay_time_id"));
     setSize (1200, 800);
     initiateComponents(p);
 }
@@ -50,9 +50,8 @@ ExodusAudioProcessorEditor::~ExodusAudioProcessorEditor()
 void ExodusAudioProcessorEditor::timerCallback()
 {
     audioProcessor.promoteInstence();
-    //indicator_debug.setBounds((84 + 64 * audioProcessor.current_instence), 650, 20, 20);
-    stopTimer();
-    startTimer(audioProcessor.delay.getDelayTime()/100);
+    indicator_debug.setBounds((84 + 64 * audioProcessor.current_instence), 650, 20, 20);
+    startTimer(*audioProcessor.tree_state.getRawParameterValue("m_delay_time_id"));
     // TODO: add mroe options
 }
 
