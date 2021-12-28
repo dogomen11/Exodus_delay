@@ -12,8 +12,7 @@
 
 float calculatePanMargin(float pan, int channel);
 
-MyDelay::MyDelay() : delay_buffer(),
-                     marked(0)
+MyDelay::MyDelay()
 {
     delay_buffer.clear();
 }
@@ -30,7 +29,15 @@ void MyDelay::setSampleRate(double new_sample_rate)
     sample_rate = new_sample_rate;
 }
 
+void MyDelay::setDelayTime(float new_delay_time)
+{
+    delay_time = new_delay_time;
+}
 
+void MyDelay::setDelayFeedback(float new_delay_feedback)
+{
+    delay_feedback = new_delay_feedback;
+}
 
 void MyDelay::fillDelayBuffer(int channel, const int buffer_length, const float* buffer_data, int buffer_write_position)
 {
@@ -61,6 +68,21 @@ void MyDelay::getFromDelayBuffer(AudioBuffer<float>& buffer, int channel, const 
         const int buffer_remaining = delay_buffer_length - read_position;
         buffer.copyFrom(channel, 0, delay_buffer_data + read_position, buffer_remaining);
         buffer.copyFrom(channel, buffer_remaining, delay_buffer_data, buffer_length - buffer_remaining);
+    }
+}
+
+
+void MyDelay::feedbackDelay(int channel, const int buffer_length, float* dry_buffer, int buffer_write_position)
+{
+    if (delay_buffer_length > buffer_length + buffer_write_position)
+    {
+        delay_buffer.addFromWithRamp(channel, buffer_write_position, dry_buffer, buffer_length, delay_feedback, delay_feedback);
+    }
+    else
+    {
+        const int buffer_remaining = delay_buffer_length - buffer_write_position;
+        delay_buffer.addFromWithRamp(channel, buffer_remaining, dry_buffer, buffer_remaining, delay_feedback, delay_feedback);
+        delay_buffer.addFromWithRamp(channel, 0, dry_buffer, buffer_length - buffer_remaining, delay_feedback, delay_feedback);
     }
 }
 

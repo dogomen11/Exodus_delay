@@ -33,9 +33,11 @@ class MyDelay
         ~MyDelay() = default;
         void setSize(int new_num_channels, int new_num_samples);
         void setSampleRate(double new_sample_rate);
+        void setDelayTime(float new_delay_time);
+        void setDelayFeedback(float new_delay_feedback);
         void fillDelayBuffer(int channel, const int buffer_length, const float* buffer_data, int buffer_write_position);
         void getFromDelayBuffer(AudioBuffer<float>& buffer, int channel, const int buffer_length, const int delay_buffer_length, int buffer_write_position);
-        //void feedbackDelay(int channel, const int buffer_length, float* dry_buffer);
+        void feedbackDelay(int channel, const int buffer_length, float* dry_buffer, int buffer_write_position);
         void applyFX(AudioBuffer<float>& temp, bool instence, float* channelData, int channel, float volume, float pan);
         float calculatePanMargin(float pan, int channel);
         int getMarked() { return marked; }

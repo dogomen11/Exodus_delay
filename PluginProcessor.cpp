@@ -139,7 +139,7 @@ void ExodusAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
     m_visualiser.clear();
     m_visualiser_2.clear();
 
-    delay.setSize(getNumInputChannels(), sampleRate * samplesPerBlock * 2);
+    delay.setSize(getNumInputChannels(), (sampleRate + samplesPerBlock) * 2);
     delay.setSampleRate(sampleRate);
 }
 
@@ -185,6 +185,9 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
         buffer.clear (i, 0, buffer.getNumSamples());
 
     int buffer_length = buffer.getNumSamples();
+    //float new_delay_time = *tree_state.getRawParameterValue("m_delay_time");
+    delay.setDelayTime(tree_state.getRawParameterValue("m_delay_time_id")->load());
+    delay.setDelayFeedback(tree_state.getRawParameterValue("m_delay_feedback_id")->load());
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
@@ -194,11 +197,13 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
             channelData[sample] = channelData[sample] * juce::Decibels::decibelsToGain(tree_state.getRawParameterValue("m_input_gain_id")->load());
         }
 
+        float* dry_buffer = buffer.getWritePointer(channel);
+        const float* buffer_data = buffer.getReadPointer(channel);
         if (delay.getMarked() == 0)
         {
-            const float* buffer_data = buffer.getReadPointer(channel);
-            //delay.fillDelayBuffer(channel, buffer_length, buffer_data, processor_buffer_write_pos);
-            //delay.getFromDelayBuffer(buffer, channel, buffer_length, delay.getNumSamples(), processor_buffer_write_pos);
+            delay.fillDelayBuffer(channel, buffer_length, buffer_data, processor_buffer_write_pos);
+            delay.getFromDelayBuffer(buffer, channel, buffer_length, delay.getNumSamples(), processor_buffer_write_pos);
+            delay.feedbackDelay(channel, buffer_length, dry_buffer, processor_buffer_write_pos);
         }
     }
     m_visualiser.pushBuffer(buffer);
