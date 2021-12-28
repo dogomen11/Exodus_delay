@@ -145,23 +145,6 @@ void MyFilter::recursiveFilter(int channel, float* buffer, float* tmp, int buffe
 
 void MyFilter::moogFilter(int channel, float* buffer, float* tmp, int buffer_length)
 {
-    //float tmp, current_sample;
-    /*
-    for (int i = 0; i < 2 * buffer.getNumSamples(); i++)
-    {
-        current_sample = buffer.getSample(channel, (i / 2));
-        tmp = tanhf(current_sample * drive);
-        if (tmp > 0)
-        {
-            tmp = tmp;
-        }
-        y_a = y_a + g * (tanhf(tmp - resonance * ((y_d_1 + y_d) / 2) - tanhf(y_a)));
-        y_b = y_b + g * (tanhf(y_a) - tanhf(y_b));
-        y_c = y_c + g * (tanhf(y_b) - tanhf(y_c));
-        y_d_1 = y_d;
-        y_d = y_d + g * (tanhf(y_c) - tanhf(y_d));
-        buffer.setSample(channel, (i / 2), y_d);
-    }*/
     for (int i = 0; i < 2 * buffer_length; i++) 
     {
         buffer[i / 2] = tanhf(buffer[i / 2] * drive);

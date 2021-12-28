@@ -75,6 +75,7 @@ public:
     void promoteInstence();
     int processor_buffer_write_pos = 0;
     MyFilter m_filter;
+    dsp::Convolution fiir_filter;
 
 private:
     //==============================================================================

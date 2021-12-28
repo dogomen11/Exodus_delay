@@ -149,6 +149,12 @@ void ExodusAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
     m_filter.setFrequency(tree_state.getRawParameterValue("m_filter_freq_id")->load());
     m_filter.setResonance(tree_state.getRawParameterValue("m_filter_res_id")->load());
     m_filter.setDrive(tree_state.getRawParameterValue("m_filter_drive_id")->load());
+
+    dsp::ProcessSpec spec;
+    spec.sampleRate = sampleRate;
+    spec.maximumBlockSize = samplesPerBlock;
+    fiir_filter.reset();
+    fiir_filter.prepare(spec);
 }
 
 void ExodusAudioProcessor::releaseResources()
@@ -244,6 +250,12 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
             m_filter.setFilterLogic(MOOG_FILTER);
             m_filter.applyFilter(channel, channelData, tmp.getWritePointer(channel), buffer_length);
         }
+        else if (delay.getMarked() == 7)
+        {
+            dsp::AudioBlock<float> block(buffer);
+            fiir_filter.process(dsp::ProcessContextReplacing<float>(block));
+        }
+        
     }
     m_visualiser.pushBuffer(buffer);
 
