@@ -2,11 +2,14 @@
   ==============================================================================
 
     MyFilter.h
-    Created: 24 Aug 2021 12:47:44pm
-    Author:  dogom
+    Created: 28 Dec 2021 4:34:10pm
+    Author:  97252
 
   ==============================================================================
 */
+
+#pragma once
+
 
 #ifndef MYFILTER
 #define MYFILTER
@@ -25,14 +28,7 @@ enum filter_logic
     THREE_TERM_AVG_FILTER,
     CENTRAL_DIFF_FILTER,
     RECURSIVR_FILTER,
-    MOOG_FILTER
-};
-
-enum filter_type
-{
-    LOW_PASS,
-    HIGH_PASS,
-    BAND_PASS
+    My_FILTER
 };
 
 /*
@@ -98,7 +94,7 @@ class RecursiveFilter : public MyFilter
 };
 
 */
-class MoogFilter
+class MyFilter
 {
 private:
     float frequency;
@@ -112,15 +108,18 @@ private:
     float y_c;
     float y_d;
     float y_d_1;
+
 public:
-    MoogFilter();
-    ~MoogFilter() = default;
-    void applyFilter(float* buffer);
+    MyFilter();
+    ~MyFilter() = default;
+    void setSampleRate(int new_sample_rate);
+
+    void applyFilter(int channel, AudioBuffer<float>& buffer, int buffer_write_position);
+
     float getFrequency();
     float getResonance();
     float getDrive();
 
-    void setSampleRate(int new_sample_rate);
     void setFrequency(float new_freq);
     void setResonance(float new_res);
     void setDrive(float d);

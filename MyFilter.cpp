@@ -2,12 +2,14 @@
   ==============================================================================
 
     MyFilter.cpp
-    Created: 24 Aug 2021 12:47:44pm
-    Author:  dogom
+    Created: 28 Dec 2021 4:34:10pm
+    Author:  97252
 
   ==============================================================================
 */
+
 #include "MyFilter.h"
+
 
 /*
 MyFilter::MyFilter(filter_logic new_logic) : filter_type(new_logic)
@@ -134,7 +136,7 @@ AudioBuffer<float> RecursiveFilter::applyFilter(int channel)
 }
 
 */
-MoogFilter::MoogFilter()
+MyFilter::MyFilter()
 {
     y_a = 0;
     y_b = 0;
@@ -148,12 +150,13 @@ MoogFilter::MoogFilter()
     f_sample_rate = 0;
 }
 
-void MoogFilter::applyFilter(float* buffer)
+void MyFilter::applyFilter(int channel, AudioBuffer<float>& buffer, int buffer_write_position)
 {
-    float tmp;
-    for (int i = 0; i < 2 * f_sample_rate; i++)
+    float tmp, current_sample;
+    for (int i = 0; i < 2 * buffer.getNumSamples(); i++)
     {
-        tmp = tanhf(buffer[i / 2] * drive);
+        current_sample = buffer.getSample(channel, (i / 2));
+        tmp = tanhf(current_sample * drive);
         if (tmp > 0)
         {
             tmp = tmp;
@@ -163,32 +166,32 @@ void MoogFilter::applyFilter(float* buffer)
         y_c = y_c + g * (tanhf(y_b) - tanhf(y_c));
         y_d_1 = y_d;
         y_d = y_d + g * (tanhf(y_c) - tanhf(y_d));
-        buffer[i / 2] =  y_d;
+        buffer.setSample(channel, (i / 2), y_d);
     }
 }
 
 
-float MoogFilter::getFrequency()
+float MyFilter::getFrequency()
 {
     return frequency;
 }
 
-float MoogFilter::getResonance()
+float MyFilter::getResonance()
 {
     return resonance;
 }
 
-float MoogFilter::getDrive()
+float MyFilter::getDrive()
 {
     return drive;
 }
 
-void MoogFilter::setSampleRate(int new_sample_rate)
+void MyFilter::setSampleRate(int new_sample_rate)
 {
     f_sample_rate = new_sample_rate;
 }
 
-void MoogFilter::setFrequency(float new_freq)
+void MyFilter::setFrequency(float new_freq)
 {
     if (new_freq > 12000.0f) new_freq = 12000.0f;
     if (new_freq < 0.0f) new_freq = 0.0f;
@@ -196,14 +199,14 @@ void MoogFilter::setFrequency(float new_freq)
     g = 1 - expf(-2 * tanf(2 * M_PI * frequency / (2 * f_sample_rate)));
 }
 
-void MoogFilter::setResonance(float new_res)
+void MyFilter::setResonance(float new_res)
 {
     if (new_res > 5.0f) new_res = 5.0f;
     if (new_res < 0.0f) new_res = 0.0f;
     resonance = new_res;
 }
 
-void MoogFilter::setDrive(float d)
+void MyFilter::setDrive(float d)
 {
     if (d > 10.0f) d = 10.0f;
     if (d < 0.1f) d = 0.1f;
