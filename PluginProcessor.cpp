@@ -206,6 +206,8 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
 
         float* dry_buffer = buffer.getWritePointer(channel);
         const float* buffer_data = buffer.getReadPointer(channel);
+        AudioBuffer<float> tmp = buffer;
+
         if (delay.getMarked() == 0)
         {
             delay.fillDelayBuffer(channel, buffer_length, buffer_data, processor_buffer_write_pos);
@@ -214,8 +216,33 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
         }
         else if (delay.getMarked() == 1)
         {
-            m_filter.setFrequency(500);
-            m_filter.applyFilter(channel, buffer, processor_buffer_write_pos);
+            m_filter.setFilterLogic(TWO_TERM_DIFF_FILTER);
+            m_filter.applyFilter(channel, channelData, tmp.getWritePointer(channel), buffer_length);
+        }
+        else if (delay.getMarked() == 2)
+        {
+            m_filter.setFilterLogic(TWO_TERM_AVG_FILTER);
+            m_filter.applyFilter(channel, channelData, tmp.getWritePointer(channel), buffer_length);
+        }
+        else if (delay.getMarked() == 3)
+        {
+            m_filter.setFilterLogic(THREE_TERM_AVG_FILTER);
+            m_filter.applyFilter(channel, channelData, tmp.getWritePointer(channel), buffer_length);
+        }
+        else if (delay.getMarked() == 4)
+        {
+            m_filter.setFilterLogic(CENTRAL_DIFF_FILTER);
+            m_filter.applyFilter(channel, channelData, tmp.getWritePointer(channel), buffer_length);
+        }
+        else if (delay.getMarked() == 5)
+        {
+            m_filter.setFilterLogic(RECURSIVR_FILTER);
+            m_filter.applyFilter(channel, channelData, tmp.getWritePointer(channel), buffer_length);
+        }
+        else if (delay.getMarked() == 6)
+        {
+            m_filter.setFilterLogic(MOOG_FILTER);
+            m_filter.applyFilter(channel, channelData, tmp.getWritePointer(channel), buffer_length);
         }
     }
     m_visualiser.pushBuffer(buffer);

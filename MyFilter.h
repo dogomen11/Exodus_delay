@@ -28,75 +28,15 @@ enum filter_logic
     THREE_TERM_AVG_FILTER,
     CENTRAL_DIFF_FILTER,
     RECURSIVR_FILTER,
-    My_FILTER
-};
-
-/*
-class MyFilter
-{
-protected:
-    float f_buffer_size = 0;
-    int f_sample_rate = 0;
-    float coefficients[5];
-    void setLowPass();
-    void setHighPass();
-    void setBandPass();
-public:
-    MyFilter(filter_logic new_logic);
-    ~MyFilter() = default;
-    void setFilterType(filter_type new_type);
-    void setSampleRate(int new_sample_rate);
-    void applyFilter(float* buffer, int channel);
-    AudioBuffer<float> applyFilter(int channel);
+    MOOG_FILTER
 };
 
 
-
-class TwoTermDifferenceFilter : public MyFilter
-{
-    public:
-        TwoTermDifferenceFilter(AudioBuffer<float>& buffer, filter_logic new_logic) : MyFilter(buffer, new_logic) {}
-        virtual ~TwoTermDifferenceFilter() = default;
-        AudioBuffer<float> applyFilter(int channel);
-};
-
-class TwoTermAverageFilter : public MyFilter
-{
-    public:
-        TwoTermAverageFilter(AudioBuffer<float>& buffer, filter_logic new_logic) : MyFilter(buffer, new_logic) {}
-        virtual ~TwoTermAverageFilter() = default;
-        AudioBuffer<float> applyFilter(int channel);
-};
-
-class ThreeTermAverageFilter : public MyFilter
-{
-    public:
-        ThreeTermAverageFilter(AudioBuffer<float>& buffer, filter_logic new_logic) : MyFilter(buffer, new_logic) {}
-        virtual ~ThreeTermAverageFilter() = default;
-        AudioBuffer<float> applyFilter(int channel);
-};
-
-class CenteralDifferenceFilter : public MyFilter
-{
-    public:
-        CenteralDifferenceFilter(AudioBuffer<float>& buffer, filter_logic new_logic) : MyFilter(buffer, new_logic) {}
-        virtual ~CenteralDifferenceFilter() = default;
-        AudioBuffer<float> applyFilter(int channel);
-};
-
-
-class RecursiveFilter : public MyFilter
-{
-    public:
-        RecursiveFilter(AudioBuffer<float>& buffer, filter_logic new_logic) : MyFilter(buffer, new_logic) {}
-        virtual ~RecursiveFilter() = default;
-        AudioBuffer<float> applyFilter(int channel);
-};
-
-*/
 class MyFilter
 {
 private:
+    int logic;
+
     float frequency;
     float g;
     float resonance;
@@ -113,8 +53,7 @@ public:
     MyFilter();
     ~MyFilter() = default;
     void setSampleRate(int new_sample_rate);
-
-    void applyFilter(int channel, AudioBuffer<float>& buffer, int buffer_write_position);
+    void applyFilter(int channel, float* buffer, float* tmp, int buffer_length);
 
     float getFrequency();
     float getResonance();
@@ -123,6 +62,15 @@ public:
     void setFrequency(float new_freq);
     void setResonance(float new_res);
     void setDrive(float d);
+
+    void setFilterLogic(int new_logic) { logic = new_logic; }
+    void twoTermDifferenceFilter(int channel, float* buffer, float* tmp, int buffer_length);
+    void twoTermAverageFilter(int channel, float* buffer, float* tmp, int buffer_length);
+    void threeTermAverageFilter(int channel, float* buffer, float* tmp, int buffer_length);
+    void centeralDifferenceFilter(int channel, float* buffer, float* tmp, int buffer_length);
+    void recursiveFilter(int channel, float* buffer, float* tmp, int buffer_length);
+    void moogFilter(int channel, float* buffer, float* tmp, int buffer_length);
+
 };
 
 #endif
