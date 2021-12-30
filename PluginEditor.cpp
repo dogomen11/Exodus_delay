@@ -20,6 +20,7 @@ ExodusAudioProcessorEditor::ExodusAudioProcessorEditor (ExodusAudioProcessor& p)
     m_output_gain_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_output_gain_id", m_output_gain);
     m_delay_time_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_delay_time_id", m_delay_time);
     m_delay_feedback_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_delay_feedback_id", m_delay_feedback);
+    m_delay_mix_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_delay_mix_id", m_delay_mix);
     m_filter_freq_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_filter_freq_id", m_filter_freq);
     m_filter_res_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_filter_res_id", m_filter_res);
     m_filter_drive_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_filter_drive_id", m_filter_drive);
@@ -190,6 +191,16 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
     addAndMakeVisible(m_delay_feedback_label);
     m_delay_feedback_label.setText("feedback", juce::dontSendNotification);
 
+    addAndMakeVisible(m_delay_mix);
+    m_delay_mix.setRange(0.0f, 100.0f,1.0f);
+    m_delay_mix.setValue(40.0f);
+    m_delay_mix.setTextValueSuffix("%");
+    m_delay_mix.setTextBoxStyle(Slider::TextBoxBelow, true, 50, 20);
+    m_delay_mix.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    //m_delay_mix.addListener(this);
+    addAndMakeVisible(m_delay_mix_label);
+    m_delay_mix_label.setText("mix", juce::dontSendNotification);
+
     addAndMakeVisible(m_filter_freq);
     m_filter_freq.setRange(20.0f, 12000.0f, 10.0f);
     m_filter_freq.setValue(2000.0f);
@@ -270,10 +281,14 @@ void ExodusAudioProcessorEditor::printComponents()
     m_volume_dials_label.setBounds(15, 500, 80, 50);
     m_on_off_buttons_label.setBounds(15, 570, 80, 50);
     m_reverb_buttons_label.setBounds(15, 620, 80, 50);
-    m_delay_time.setBounds(200, 710, 90, 90);
-    m_delay_time_label.setBounds(120, 735, 90, 30);
-    m_delay_feedback.setBounds(400, 710, 90, 90);
-    m_delay_feedback_label.setBounds(320, 735, 90, 30);
+
+    m_delay_time.setBounds(90, 710, 90, 90);
+    m_delay_time_label.setBounds(60, 835, 90, 30);
+    m_delay_feedback.setBounds(170, 710, 90, 90);
+    m_delay_feedback_label.setBounds(140, 835, 90, 30);
+    m_delay_mix.setBounds(310, 710, 90, 90);
+    m_delay_mix_label.setBounds(340, 835, 90, 30);
+
     m_filter_freq.setBounds(600, 710, 70, 70);
     m_filter_freq_label.setBounds(600, 770, 90, 30);
     m_filter_res.setBounds(680, 710, 70, 70);

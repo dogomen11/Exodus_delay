@@ -72,6 +72,8 @@ private:
     Label m_delay_time_label;
     Slider m_delay_feedback;
     Label m_delay_feedback_label;
+    Slider m_delay_mix;
+    Label m_delay_mix_label;
 
     ImageComponent m_background;
 
@@ -88,6 +90,7 @@ public:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_output_gain_attach;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_delay_time_attach;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_delay_feedback_attach;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_delay_mix_attach;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_filter_freq_attach;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_filter_res_attach;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_filter_drive_attach;

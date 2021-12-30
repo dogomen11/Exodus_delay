@@ -21,7 +21,7 @@ ExodusAudioProcessor::ExodusAudioProcessor()
                      #endif
                        ),
                     tree_state(*this, nullptr, "PARAMETER", create_parameter_layout()),
-                    delay(), m_filter()
+                    delay(), m_filter(), fiir_filter()
 #endif
 {
 }
@@ -38,6 +38,7 @@ AudioProcessorValueTreeState::ParameterLayout ExodusAudioProcessor::create_param
     parameters.add((std::make_unique<AudioParameterFloat>("m_output_gain_id", "m_output_gain_name", NormalisableRange<float>(-60.0, 6.0, 1.0), 0.0)));
     parameters.add((std::make_unique<AudioParameterFloat>("m_delay_time_id", "m_delay_time_name", NormalisableRange<float>(0.0, 1500.0, 1.0), 500.0)));
     parameters.add((std::make_unique<AudioParameterFloat>("m_delay_feedback_id", "m_delay_feedback_name", NormalisableRange<float>(0.0, 0.84, 0.01), 0.42)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_delay_mix_id", "m_delay_mix_name", NormalisableRange<float>(0.0, 100.0, 1.0), 40.0)));
     parameters.add((std::make_unique<AudioParameterFloat>("m_filter_freq_id", "m_filter_freq_name", NormalisableRange<float>(00.0, 12000.0, 10.0), 2000.0)));
     parameters.add((std::make_unique<AudioParameterFloat>("m_filter_res_id", "m_filter_res_name", NormalisableRange<float>(0.0, 5.0, 0.01), 1.0)));
     parameters.add((std::make_unique<AudioParameterFloat>("m_filter_drive_id", "m_filter_drive_name", NormalisableRange<float>(0.1, 10.0, 0.01), 1.0)));
@@ -153,8 +154,10 @@ void ExodusAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
     dsp::ProcessSpec spec;
     spec.sampleRate = sampleRate;
     spec.maximumBlockSize = samplesPerBlock;
+
     fiir_filter.reset();
     fiir_filter.prepare(spec);
+    fiir_filter.setMode(dsp::LadderFilterMode::LPF24);
 }
 
 void ExodusAudioProcessor::releaseResources()
@@ -201,6 +204,11 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
     int buffer_length = buffer.getNumSamples();
     delay.setDelayTime(tree_state.getRawParameterValue("m_delay_time_id")->load());
     delay.setDelayFeedback(tree_state.getRawParameterValue("m_delay_feedback_id")->load());
+    delay.setDelayMix(tree_state.getRawParameterValue("m_delay_mix_id")->load());
+
+    dsp::AudioBlock<float> block(buffer);
+
+    //m_visualiser.pushBuffer(buffer);
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
@@ -209,6 +217,7 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
         {
             channelData[sample] = channelData[sample] * juce::Decibels::decibelsToGain(tree_state.getRawParameterValue("m_input_gain_id")->load());
         }
+
 
         float* dry_buffer = buffer.getWritePointer(channel);
         const float* buffer_data = buffer.getReadPointer(channel);
@@ -252,12 +261,15 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
         }
         else if (delay.getMarked() == 7)
         {
-            dsp::AudioBlock<float> block(buffer);
+            
+            fiir_filter.setEnabled(true);
+            fiir_filter.setCutoffFrequencyHz(tree_state.getRawParameterValue("m_filter_freq_id")->load());
+            //fiir_filter.setResonance(tree_state.getRawParameterValue("m_filter_res_id")->load());
+            //fiir_filter.setDrive(tree_state.getRawParameterValue("m_filter_drive_id")->load());
             fiir_filter.process(dsp::ProcessContextReplacing<float>(block));
         }
         
     }
-    m_visualiser.pushBuffer(buffer);
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {

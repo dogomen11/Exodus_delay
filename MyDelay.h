@@ -24,7 +24,8 @@ class MyDelay
         double sample_rate;
         float delay_time;
         float delay_feedback;
-        
+        float delay_mix;
+
     public:
         bool d_on_off[NUM_OF_INSTENCES] = { 0 };
         bool d_reverb[NUM_OF_INSTENCES] = { 0 };
@@ -35,6 +36,7 @@ class MyDelay
         void setSampleRate(double new_sample_rate);
         void setDelayTime(float new_delay_time);
         void setDelayFeedback(float new_delay_feedback);
+        void setDelayMix(float new_delay_mix);
         void fillDelayBuffer(int channel, const int buffer_length, const float* buffer_data, int buffer_write_position);
         void getFromDelayBuffer(AudioBuffer<float>& buffer, int channel, const int buffer_length, const int delay_buffer_length, int buffer_write_position);
         void feedbackDelay(int channel, const int buffer_length, float* dry_buffer, int buffer_write_position);

@@ -39,6 +39,11 @@ void MyDelay::setDelayFeedback(float new_delay_feedback)
     delay_feedback = new_delay_feedback;
 }
 
+void MyDelay::setDelayMix(float new_delay_mix)
+{
+    delay_mix = new_delay_mix;
+}
+
 void MyDelay::fillDelayBuffer(int channel, const int buffer_length, const float* buffer_data, int buffer_write_position)
 {
     if (delay_buffer_length > buffer_length + buffer_write_position)
@@ -61,13 +66,13 @@ void MyDelay::getFromDelayBuffer(AudioBuffer<float>& buffer, int channel, const 
     const float* delay_buffer_data = delay_buffer.getReadPointer(channel);
     if (delay_buffer_length > buffer_length + read_position)
     {
-        buffer.addFrom(channel, 0, delay_buffer_data + read_position, buffer_length);
+        buffer.addFrom(channel, 0, delay_buffer_data + read_position, buffer_length, delay_mix/80);  //TODO: change delay mix divider
     }
     else
     {
         const int buffer_remaining = delay_buffer_length - read_position;
-        buffer.copyFrom(channel, 0, delay_buffer_data + read_position, buffer_remaining);
-        buffer.copyFrom(channel, buffer_remaining, delay_buffer_data, buffer_length - buffer_remaining);
+        buffer.copyFrom(channel, 0, delay_buffer_data + read_position, buffer_remaining, delay_mix / 80);
+        buffer.copyFrom(channel, buffer_remaining, delay_buffer_data, buffer_length - buffer_remaining, delay_mix / 80);
     }
 }
 
