@@ -66,13 +66,13 @@ void MyDelay::getFromDelayBuffer(AudioBuffer<float>& buffer, int channel, const 
     const float* delay_buffer_data = delay_buffer.getReadPointer(channel);
     if (delay_buffer_length > buffer_length + read_position)
     {
-        buffer.addFrom(channel, 0, delay_buffer_data + read_position, buffer_length, delay_mix/80);  //TODO: change delay mix divider
+        buffer.addFrom(channel, 0, delay_buffer_data + read_position, buffer_length, powf((delay_mix / 100), 1.5));  //TODO: change delay mix divider
     }
     else
     {
         const int buffer_remaining = delay_buffer_length - read_position;
-        buffer.copyFrom(channel, 0, delay_buffer_data + read_position, buffer_remaining, delay_mix / 80);
-        buffer.copyFrom(channel, buffer_remaining, delay_buffer_data, buffer_length - buffer_remaining, delay_mix / 80);
+        buffer.copyFrom(channel, 0, delay_buffer_data + read_position, buffer_remaining, powf((delay_mix / 100), 1.5));
+        buffer.copyFrom(channel, buffer_remaining, delay_buffer_data, buffer_length - buffer_remaining, powf((delay_mix / 100), 1.5));
     }
 }
 
