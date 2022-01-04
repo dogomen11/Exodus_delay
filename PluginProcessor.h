@@ -75,7 +75,7 @@ public:
     void promoteInstence();
     int processor_buffer_write_pos = 0;
     MyFilter m_filter;
-    dsp::LadderFilter<float> fiir_filter;
+    dsp::Reverb fiir_filter;
 
 private:
     //==============================================================================

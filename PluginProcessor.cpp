@@ -155,9 +155,8 @@ void ExodusAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
     spec.sampleRate = sampleRate;
     spec.maximumBlockSize = samplesPerBlock;
 
-    fiir_filter.reset();
     fiir_filter.prepare(spec);
-    fiir_filter.setMode(dsp::LadderFilterMode::LPF24);
+    
 }
 
 void ExodusAudioProcessor::releaseResources()
@@ -206,7 +205,7 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
     delay.setDelayFeedback(tree_state.getRawParameterValue("m_delay_feedback_id")->load());
     delay.setDelayMix(tree_state.getRawParameterValue("m_delay_mix_id")->load());
 
-    dsp::AudioBlock<float> block(buffer);
+    dsp::AudioBlock<float> audio_block{ buffer };
 
     //m_visualiser.pushBuffer(buffer);
 
@@ -263,14 +262,14 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
         {
             
             fiir_filter.setEnabled(true);
-            fiir_filter.setCutoffFrequencyHz(tree_state.getRawParameterValue("m_filter_freq_id")->load());
+            //fiir_filter.setCutoffFrequencyHz(tree_state.getRawParameterValue("m_filter_freq_id")->load());
             //fiir_filter.setResonance(tree_state.getRawParameterValue("m_filter_res_id")->load());
             //fiir_filter.setDrive(tree_state.getRawParameterValue("m_filter_drive_id")->load());
-            fiir_filter.process(dsp::ProcessContextReplacing<float>(block));
+            fiir_filter.process(dsp::ProcessContextReplacing<float>(audio_block));
         }
         
     }
-
+    /*
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer(channel);
@@ -280,7 +279,7 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
         }
     }
     m_visualiser_2.pushBuffer(buffer);
-
+    */
     processor_buffer_write_pos += buffer_length;
     processor_buffer_write_pos %= delay.getNumSamples();
 }
