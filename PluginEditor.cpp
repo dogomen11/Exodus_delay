@@ -40,6 +40,11 @@ ExodusAudioProcessorEditor::ExodusAudioProcessorEditor (ExodusAudioProcessor& p)
         m_reverb_buttons_attach[i] = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.tree_state, reverb_button_id, m_reverb_buttons[i]);
     }
     startTimerHz(*audioProcessor.tree_state.getRawParameterValue("m_delay_time_id"));
+    winSizeRatio = 3.0 / 1.0;
+    setResizable(true, true);
+    //setResizeLimits(600, juce::roundToInt(600.0 / winSizeRatio), 1200, juce::roundToInt(1200.0 / winSizeRatio));
+    //getConstrainer()->setFixedAspectRatio(winSizeRatio);
+    //setResizeLimits(600, 400, 1200, 800);
     setSize (1200, 800);
     initiateComponents(p);
 }
@@ -310,5 +315,6 @@ void ExodusAudioProcessorEditor::printComponents()
 
 void ExodusAudioProcessorEditor::resized()
 {
+    auto bounds = getLocalBounds().toFloat() .removeFromBottom(getHeight() * 0.9f) .reduced(getWidth() * 0.06f, getHeight() * 0.25f);
     printComponents();
 }

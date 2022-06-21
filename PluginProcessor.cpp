@@ -207,7 +207,7 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
 
     dsp::AudioBlock<float> audio_block{ buffer };
 
-    //m_visualiser.pushBuffer(buffer);
+    m_visualiser.pushBuffer(buffer);
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
@@ -228,48 +228,13 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
             delay.getFromDelayBuffer(buffer, channel, buffer_length, delay.getNumSamples(), processor_buffer_write_pos);
             delay.feedbackDelay(channel, buffer_length, dry_buffer, processor_buffer_write_pos);
         }
-        else if (delay.getMarked() == 1)
-        {
-            m_filter.setFilterLogic(TWO_TERM_DIFF_FILTER);
-            m_filter.applyFilter(channel, channelData, tmp.getWritePointer(channel), buffer_length);
-        }
-        else if (delay.getMarked() == 2)
-        {
-            m_filter.setFilterLogic(TWO_TERM_AVG_FILTER);
-            m_filter.applyFilter(channel, channelData, tmp.getWritePointer(channel), buffer_length);
-        }
-        else if (delay.getMarked() == 3)
-        {
-            m_filter.setFilterLogic(THREE_TERM_AVG_FILTER);
-            m_filter.applyFilter(channel, channelData, tmp.getWritePointer(channel), buffer_length);
-        }
-        else if (delay.getMarked() == 4)
-        {
-            m_filter.setFilterLogic(CENTRAL_DIFF_FILTER);
-            m_filter.applyFilter(channel, channelData, tmp.getWritePointer(channel), buffer_length);
-        }
-        else if (delay.getMarked() == 5)
-        {
-            m_filter.setFilterLogic(RECURSIVR_FILTER);
-            m_filter.applyFilter(channel, channelData, tmp.getWritePointer(channel), buffer_length);
-        }
-        else if (delay.getMarked() == 6)
-        {
-            m_filter.setFilterLogic(MOOG_FILTER);
-            m_filter.applyFilter(channel, channelData, tmp.getWritePointer(channel), buffer_length);
-        }
-        else if (delay.getMarked() == 7)
+        else
         {
             
-            fiir_filter.setEnabled(true);
-            //fiir_filter.setCutoffFrequencyHz(tree_state.getRawParameterValue("m_filter_freq_id")->load());
-            //fiir_filter.setResonance(tree_state.getRawParameterValue("m_filter_res_id")->load());
-            //fiir_filter.setDrive(tree_state.getRawParameterValue("m_filter_drive_id")->load());
-            fiir_filter.process(dsp::ProcessContextReplacing<float>(audio_block));
         }
         
     }
-    /*
+    
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer(channel);
@@ -279,7 +244,7 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
         }
     }
     m_visualiser_2.pushBuffer(buffer);
-    */
+    
     processor_buffer_write_pos += buffer_length;
     processor_buffer_write_pos %= delay.getNumSamples();
 }

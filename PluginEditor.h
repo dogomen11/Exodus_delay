@@ -36,20 +36,23 @@ private:
 
     class timer_indicator : public Component
     {
-    public:
-        timer_indicator() = default;
-        ~timer_indicator() = default;
-        void paint(Graphics& g) override {
-            Rectangle<float> timer_area(84, 650, 20, 20);
-            g.setColour(Colours::blueviolet);
-            g.drawEllipse(timer_area, 2.0);
-        }
-        void resized() override { }
-    private:
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(timer_indicator)
+        public:
+            timer_indicator() = default;
+            ~timer_indicator() = default;
+            void paint(Graphics& g) override {
+                Rectangle<float> timer_area(84, 650, 20, 20);
+                g.setColour(Colours::blueviolet);
+                g.drawEllipse(timer_area, 2.0);
+            }
+            void resized() override { }
+        private:
+            JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(timer_indicator)
     };
+
     timer_indicator ti_instence;
     void timerCallback() override;
+
+    double winSizeRatio;
 
     ToggleButton indicator_debug;
 
