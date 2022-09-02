@@ -35,16 +35,16 @@ AudioProcessorValueTreeState::ParameterLayout ExodusAudioProcessor::create_param
 {
     juce::AudioProcessorValueTreeState::ParameterLayout parameters;
 
-    parameters.add((std::make_unique<AudioParameterFloat>("m_input_gain_id", "m_input_gain_name", NormalisableRange<float>(-60.0, 6.0, 1.0), 0.0)));
-    parameters.add((std::make_unique<AudioParameterFloat>("m_output_gain_id", "m_output_gain_name", NormalisableRange<float>(-60.0, 6.0, 1.0), 0.0)));
-    parameters.add((std::make_unique<AudioParameterFloat>("m_delay_time_id", "m_delay_time_name", NormalisableRange<float>(0.0, 1500.0, 1.0), 500.0)));
-    parameters.add((std::make_unique<AudioParameterFloat>("m_delay_feedback_id", "m_delay_feedback_name", NormalisableRange<float>(0.0, 0.85, 0.01), 0.42)));
-    parameters.add((std::make_unique<AudioParameterFloat>("m_delay_mix_id", "m_delay_mix_name", NormalisableRange<float>(0.0, 100.0, 1.0), 40.0)));
-    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_room_size_id", "m_reverb_room_size_name", NormalisableRange<float>(0.0, 100.0, 1.0), 40.0)));
-    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_damping_id", "m_reverb_damping_name", NormalisableRange<float>(0.0, 100.0, 1.0), 40.0)));
-    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_width_id", "m_reverb_width_name", NormalisableRange<float>(0.0, 100.0, 1.0), 40.0)));
-    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_wet_level_id", "m_reverb_wet_level_name", NormalisableRange<float>(0.0, 100.0, 1.0), 40.0)));
-    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_dry_level_id", "m_reverb_dry_level_name", NormalisableRange<float>(0.0, 100.0, 1.0), 40.0)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_input_gain_id", "m_input_gain_name",               NormalisableRange<float>(-60.0, 6.0, 1.0), 0.0)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_output_gain_id", "m_output_gain_name",             NormalisableRange<float>(-60.0, 6.0, 1.0), 0.0)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_delay_time_id", "m_delay_time_name",               NormalisableRange<float>(0.0, 1500.0, 1.0), 500.0)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_delay_feedback_id", "m_delay_feedback_name",       NormalisableRange<float>(0.0, 0.85, 0.01), 0.42)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_delay_mix_id", "m_delay_mix_name",                 NormalisableRange<float>(0.0, 100.0, 1.0), 40.0)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_room_size_id", "m_reverb_room_size_name",   NormalisableRange<float>(0.0, 1.0, 0.05), 0.4)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_damping_id", "m_reverb_damping_name",       NormalisableRange<float>(0.0, 1.0, 0.05), 0.4)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_width_id", "m_reverb_width_name",           NormalisableRange<float>(0.0, 1.0, 0.05), 0.4)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_wet_level_id", "m_reverb_wet_level_name",   NormalisableRange<float>(0.0, 1.0, 0.05), 0.4)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_dry_level_id", "m_reverb_dry_level_name",   NormalisableRange<float>(0.0, 1.0, 0.05), 0.4)));
 
 
     for (int i = 0; i < NUM_OF_INSTENCES; i++)
@@ -202,13 +202,13 @@ void ExodusAudioProcessor::updateDelaySettings()
 
 void ExodusAudioProcessor::updateReverbSettings()
 {
-    reverb_params.roomSize = 0.7f; //tree_state.getParameter(ParamIDs::size)->getValue();
-    reverb_params.damping =  0.4f; //tree_state.getParameter(ParamIDs::damp)->getValue();
-    reverb_params.width =    0.7f; //tree_state.getParameter(ParamIDs::width)->getValue();
-    reverb_params.wetLevel = 0.7f; //tree_state.getParameter(ParamIDs::dryWet)->getValue();
-    reverb_params.dryLevel = 0.3f; //tree_state.getParameter(ParamIDs::dryWet)->getValue();
+    reverb_params.roomSize = tree_state.getRawParameterValue("m_reverb_roon_size_id")->load();
+    //reverb_params.damping =  tree_state.getRawParameterValue("m_reverb_damping_id")->load();
+    //reverb_params.width =    tree_state.getRawParameterValue("m_reverb_width_id")->load();
+    //reverb_params.wetLevel = tree_state.getRawParameterValue("m_reverb_wet_level_id")->load();
+    //reverb_params.dryLevel = tree_state.getRawParameterValue("m_reverb_dry_level_id")->load();
 
-    reverb.setParameters(reverb_params);
+    //reverb.setParameters(reverb_params);
 }
 
 void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
@@ -240,12 +240,18 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
         const float* buffer_data = buffer.getReadPointer(channel);
         AudioBuffer<float> tmp = buffer;
 
-        if (delay.getOnOffMarked() > 0)
+        if (delay.getOnOffMarked() == 1)
         {
             delay.fillDelayBuffer(channel, buffer_length, buffer_data, processor_buffer_write_pos);
             delay.getFromDelayBuffer(buffer, channel, buffer_length, delay.getNumSamples(), processor_buffer_write_pos);
             delay.feedbackDelay(channel, buffer_length, dry_buffer, processor_buffer_write_pos);
         }
+    }
+
+    if (delay.getOnOffMarked() == 2)
+    {
+        juce::dsp::ProcessContextReplacing<float> ctx(audio_block);
+        reverb.process(ctx);
     }
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
