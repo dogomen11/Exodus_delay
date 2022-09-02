@@ -149,11 +149,10 @@ void MyDelay::subOnOffMarked(int instence)
 
 void MyDelay::addReverbMarked(int instence)
 {
-    //TODO: decomment this shit
-    //if (d_on_off[instence] == false)
-    //{
-    //    return;
-    //}
+    if (d_on_off[instence] == false)
+    {
+        return;
+    }
 
     d_reverb[instence] = true;
     reverb_marked++;

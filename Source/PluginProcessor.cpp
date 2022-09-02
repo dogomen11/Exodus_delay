@@ -40,6 +40,12 @@ AudioProcessorValueTreeState::ParameterLayout ExodusAudioProcessor::create_param
     parameters.add((std::make_unique<AudioParameterFloat>("m_delay_time_id", "m_delay_time_name", NormalisableRange<float>(0.0, 1500.0, 1.0), 500.0)));
     parameters.add((std::make_unique<AudioParameterFloat>("m_delay_feedback_id", "m_delay_feedback_name", NormalisableRange<float>(0.0, 0.85, 0.01), 0.42)));
     parameters.add((std::make_unique<AudioParameterFloat>("m_delay_mix_id", "m_delay_mix_name", NormalisableRange<float>(0.0, 100.0, 1.0), 40.0)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_room_size_id", "m_reverb_room_size_name", NormalisableRange<float>(0.0, 100.0, 1.0), 40.0)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_damping_id", "m_reverb_damping_name", NormalisableRange<float>(0.0, 100.0, 1.0), 40.0)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_width_id", "m_reverb_width_name", NormalisableRange<float>(0.0, 100.0, 1.0), 40.0)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_wet_level_id", "m_reverb_wet_level_name", NormalisableRange<float>(0.0, 100.0, 1.0), 40.0)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_dry_level_id", "m_reverb_dry_level_name", NormalisableRange<float>(0.0, 100.0, 1.0), 40.0)));
+
 
     for (int i = 0; i < NUM_OF_INSTENCES; i++)
     {
@@ -230,7 +236,6 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
             channelData[sample] = channelData[sample] * juce::Decibels::decibelsToGain(tree_state.getRawParameterValue("m_input_gain_id")->load());
         }
 
-
         float* dry_buffer = buffer.getWritePointer(channel);
         const float* buffer_data = buffer.getReadPointer(channel);
         AudioBuffer<float> tmp = buffer;
@@ -242,13 +247,6 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
             delay.feedbackDelay(channel, buffer_length, dry_buffer, processor_buffer_write_pos);
         }
     }
-    /*
-    if (delay.getReverbMarked() == 1)
-    {
-        dsp::ProcessContextReplacing<float> ctx(audio_block);
-        reverb.process(ctx);
-    }
-    */
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {

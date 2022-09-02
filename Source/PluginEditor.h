@@ -78,6 +78,26 @@ private:
     Slider m_delay_mix;
     Label m_delay_mix_label;
 
+    //Reverb room size
+    Slider m_reverb_room_size;
+    Label m_reverb_room_size_label;
+
+    //Reverb damping
+    Slider m_reverb_damping;
+    Label m_reverb_damping_label;
+
+    //Reverb width
+    Slider m_reverb_width;
+    Label m_reverb_width_label;
+
+    //Reverb wet level
+    Slider m_reverb_wet_level;
+    Label m_reverb_wet_level_label;
+
+    //Reverb dry level
+    Slider m_reverb_dry_level;
+    Label m_reverb_dry_level_label;
+
     // Backgroungd 
     ImageComponent m_background;
 
@@ -88,6 +108,11 @@ public:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_delay_time_attach;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_delay_feedback_attach;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_delay_mix_attach;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_reverb_room_size_attach;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_reverb_damping_attach;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_reverb_width_attach;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_reverb_wet_level_attach;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_reverb_dry_level_attach;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_volume_dials_attach[NUM_OF_INSTENCES];
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_pan_dials_attach[NUM_OF_INSTENCES];
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> m_on_off_buttons_attach[NUM_OF_INSTENCES];
