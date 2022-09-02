@@ -185,14 +185,22 @@ bool ExodusAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) c
 }
 #endif
 
+void ExodusAudioProcessor::updateDelaySettings()
+{
+    delay_params.delay_mix = tree_state.getRawParameterValue("m_delay_mix_id")->load();
+    delay_params.delay_time = tree_state.getRawParameterValue("m_delay_time_id")->load();
+    delay_params.delay_feedback = tree_state.getRawParameterValue("m_delay_feedback_id")->load();
+
+    delay.setParameters(delay_params);
+}
+
 void ExodusAudioProcessor::updateReverbSettings()
 {
     reverb_params.roomSize = 0.7f; //tree_state.getParameter(ParamIDs::size)->getValue();
     reverb_params.damping =  0.4f; //tree_state.getParameter(ParamIDs::damp)->getValue();
     reverb_params.width =    0.7f; //tree_state.getParameter(ParamIDs::width)->getValue();
-    reverb_params.wetLevel = 0.7f; // tree_state.getParameter(ParamIDs::dryWet)->getValue();
-    reverb_params.dryLevel = 0.3f; //- tree_state.getParameter(ParamIDs::dryWet)->getValue();
-    //reverb_params.freezeMode = tree_state.getParameter(ParamIDs::freeze)->getValue();
+    reverb_params.wetLevel = 0.7f; //tree_state.getParameter(ParamIDs::dryWet)->getValue();
+    reverb_params.dryLevel = 0.3f; //tree_state.getParameter(ParamIDs::dryWet)->getValue();
 
     reverb.setParameters(reverb_params);
 }
@@ -202,16 +210,13 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
-
+    updateDelaySettings();
     updateReverbSettings();
 
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
     int buffer_length = buffer.getNumSamples();
-    delay.setDelayTime(tree_state.getRawParameterValue("m_delay_time_id")->load());
-    delay.setDelayFeedback(tree_state.getRawParameterValue("m_delay_feedback_id")->load());
-    delay.setDelayMix(tree_state.getRawParameterValue("m_delay_mix_id")->load());
 
     dsp::AudioBlock<float> audio_block{ buffer };
 
@@ -230,20 +235,21 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
         const float* buffer_data = buffer.getReadPointer(channel);
         AudioBuffer<float> tmp = buffer;
 
-        if (delay.getOnOffMarked() == 1)
+        if (delay.getOnOffMarked() > 0)
         {
             delay.fillDelayBuffer(channel, buffer_length, buffer_data, processor_buffer_write_pos);
             delay.getFromDelayBuffer(buffer, channel, buffer_length, delay.getNumSamples(), processor_buffer_write_pos);
             delay.feedbackDelay(channel, buffer_length, dry_buffer, processor_buffer_write_pos);
         }
     }
-
+    /*
     if (delay.getReverbMarked() == 1)
     {
         dsp::ProcessContextReplacing<float> ctx(audio_block);
         reverb.process(ctx);
     }
-    
+    */
+
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer(channel);

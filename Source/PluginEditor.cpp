@@ -80,7 +80,6 @@ void ExodusAudioProcessorEditor::buttonClicked(Button* button)
         }
         else if (button == &m_reverb_buttons[i])
         {
-            //int x = 8 / audioProcessor.delay.getReverbMarked();
             audioProcessor.delay.d_reverb[i] = m_reverb_buttons[i].getToggleState();
             switch (m_reverb_buttons[i].getToggleState())
             {

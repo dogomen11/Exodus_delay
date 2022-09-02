@@ -71,8 +71,10 @@ public:
     Visualiser m_visualiser_2;
 
     MyDelay delay;
+    MyDelay::Parameters delay_params;
     dsp::Reverb reverb;
     dsp::Reverb::Parameters reverb_params;
+    void updateDelaySettings();
     void updateReverbSettings();
     int current_instence = 0;
     int processor_buffer_write_pos = 0;
