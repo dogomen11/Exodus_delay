@@ -174,7 +174,6 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
     m_input_gain.setTextValueSuffix("db");
     m_input_gain.setTextBoxStyle(Slider::TextBoxBelow, true, 80, 20);
     m_input_gain.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    //m_input_gain.addListener(this);
     addAndMakeVisible(m_input_gain_label);
     m_input_gain_label.setText("input", juce::dontSendNotification);
 
@@ -185,7 +184,6 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
     m_output_gain.setTextValueSuffix("db");
     m_output_gain.setTextBoxStyle(Slider::TextBoxBelow, true, 80, 20);
     m_output_gain.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    //m_output_gain.addListener(this);
     addAndMakeVisible(m_output_gain_label);
     m_output_gain_label.setText("output", juce::dontSendNotification);
 
@@ -195,7 +193,6 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
     m_delay_time.setTextValueSuffix("ms");
     m_delay_time.setTextBoxStyle(Slider::TextBoxBelow, true, 50, 20);
     m_delay_time.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    //m_delay_time.addListener(this);
     addAndMakeVisible(m_delay_time_label);
     m_delay_time_label.setText("time", juce::dontSendNotification);
 
@@ -205,7 +202,6 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
     m_delay_feedback.setTextValueSuffix("%");
     m_delay_feedback.setTextBoxStyle(Slider::TextBoxBelow, true, 50, 20);
     m_delay_feedback.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    //m_delay_feedback.addListener(this);
     addAndMakeVisible(m_delay_feedback_label);
     m_delay_feedback_label.setText("feedback", juce::dontSendNotification);
 
@@ -215,7 +211,6 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
     m_delay_mix.setTextValueSuffix("%");
     m_delay_mix.setTextBoxStyle(Slider::TextBoxBelow, true, 50, 20);
     m_delay_mix.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    //m_delay_mix.addListener(this);
     addAndMakeVisible(m_delay_mix_label);
     m_delay_mix_label.setText("mix", juce::dontSendNotification);
 
@@ -225,7 +220,6 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
     m_reverb_room_size.setTextValueSuffix("%");
     m_reverb_room_size.setTextBoxStyle(Slider::TextBoxBelow, true, 50, 20);
     m_reverb_room_size.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    //m_reverb_room_size.addListener(this);
     addAndMakeVisible(m_reverb_room_size_label);
     m_reverb_room_size_label.setText("room size", juce::dontSendNotification);
 
@@ -235,7 +229,6 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
     m_reverb_damping.setTextValueSuffix("%");
     m_reverb_damping.setTextBoxStyle(Slider::TextBoxBelow, true, 50, 20);
     m_reverb_damping.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    //m_reverb_damping.addListener(this);
     addAndMakeVisible(m_reverb_damping_label);
     m_reverb_damping_label.setText("damping", juce::dontSendNotification);
 
@@ -245,7 +238,6 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
     m_reverb_width.setTextValueSuffix("%");
     m_reverb_width.setTextBoxStyle(Slider::TextBoxBelow, true, 50, 20);
     m_reverb_width.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    //m_reverb_width.addListener(this);
     addAndMakeVisible(m_reverb_width_label);
     m_reverb_width_label.setText("width", juce::dontSendNotification);
 
@@ -255,7 +247,6 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
     m_reverb_wet_level.setTextValueSuffix("%");
     m_reverb_wet_level.setTextBoxStyle(Slider::TextBoxBelow, true, 50, 20);
     m_reverb_wet_level.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    //m_reverb_wet_level.addListener(this);
     addAndMakeVisible(m_reverb_wet_level_label);
     m_reverb_wet_level_label.setText("wet", juce::dontSendNotification);
 
@@ -265,7 +256,6 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
     m_reverb_dry_level.setTextValueSuffix("%");
     m_reverb_dry_level.setTextBoxStyle(Slider::TextBoxBelow, true, 50, 20);
     m_reverb_dry_level.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    //m_reverb_dry_level.addListener(this);
     addAndMakeVisible(m_reverb_dry_level_label);
     m_reverb_dry_level_label.setText("dry", juce::dontSendNotification);
 
@@ -278,7 +268,6 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
         m_volume_dials[i].setValue(1.0f);
         m_volume_dials[i].setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
         m_volume_dials[i].setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-        //m_volume_dials[i].addListener(this);
         m_volume_dials[i].setOpaque(false);
         if (audioProcessor.delay.getOnOffMarked() == 0) { m_volume_dials[i].setAlpha(TRANSPARENT); }
 
@@ -287,7 +276,6 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
         m_pan_dials[i].setValue(0.0f);
         m_pan_dials[i].setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
         m_pan_dials[i].setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-        //m_pan_dials[i].addListener(this);
         m_pan_dials[i].setOpaque(false);
         if (audioProcessor.delay.getOnOffMarked() == 0) { m_pan_dials[i].setAlpha(TRANSPARENT); }
 
