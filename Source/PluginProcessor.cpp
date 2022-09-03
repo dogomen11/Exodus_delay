@@ -202,13 +202,13 @@ void ExodusAudioProcessor::updateDelaySettings()
 
 void ExodusAudioProcessor::updateReverbSettings()
 {
-    reverb_params.roomSize = tree_state.getRawParameterValue("m_reverb_roon_size_id")->load();
-    //reverb_params.damping =  tree_state.getRawParameterValue("m_reverb_damping_id")->load();
-    //reverb_params.width =    tree_state.getRawParameterValue("m_reverb_width_id")->load();
-    //reverb_params.wetLevel = tree_state.getRawParameterValue("m_reverb_wet_level_id")->load();
-    //reverb_params.dryLevel = tree_state.getRawParameterValue("m_reverb_dry_level_id")->load();
+    reverb_params.roomSize = tree_state.getRawParameterValue("m_reverb_room_size_id")->load();
+    reverb_params.damping =  tree_state.getRawParameterValue("m_reverb_damping_id")->load();
+    reverb_params.width =    tree_state.getRawParameterValue("m_reverb_width_id")->load();
+    reverb_params.wetLevel = tree_state.getRawParameterValue("m_reverb_wet_level_id")->load();
+    reverb_params.dryLevel = tree_state.getRawParameterValue("m_reverb_dry_level_id")->load();
 
-    //reverb.setParameters(reverb_params);
+    reverb.setParameters(reverb_params);
 }
 
 void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)

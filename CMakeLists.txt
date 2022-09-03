@@ -1,6 +1,9 @@
+cmake_minimum_required(VERSION 3.17)
+
 project(Exodus VERSION 0.0.1)
 
 set (BaseTargetName Exodus)
+
 
 juce_add_plugin("${BaseTargetName}"
         # VERSION ...                               # Set this if the plugin version is different to the project version

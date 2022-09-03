@@ -21,11 +21,11 @@ ExodusAudioProcessorEditor::ExodusAudioProcessorEditor (ExodusAudioProcessor& p)
     m_delay_time_attach =       std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_delay_time_id", m_delay_time);
     m_delay_feedback_attach =   std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_delay_feedback_id", m_delay_feedback);
     m_delay_mix_attach =        std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_delay_mix_id", m_delay_mix);
-    m_reverb_room_size_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_reverb_room_size_id", m_reverb_room_size);;
-    m_reverb_damping_attach =   std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_reverb_damping_id", m_reverb_damping);;
-    m_reverb_width_attach =     std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_reverb_width_id", m_reverb_width);;
-    m_reverb_wet_level_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_reverb_wet_level_id", m_reverb_wet_level);;
-    m_reverb_dry_level_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_reverb_dry_level_id", m_reverb_dry_level);;
+    m_reverb_room_size_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_reverb_room_size_id", m_reverb_room_size);
+    m_reverb_damping_attach =   std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_reverb_damping_id", m_reverb_damping);
+    m_reverb_width_attach =     std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_reverb_width_id", m_reverb_width);
+    m_reverb_wet_level_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_reverb_wet_level_id", m_reverb_wet_level);
+    m_reverb_dry_level_attach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree_state, "m_reverb_dry_level_id", m_reverb_dry_level);
 
 
     for (int i = 0; i < NUM_OF_INSTENCES; i++)
@@ -220,8 +220,8 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
     m_delay_mix_label.setText("mix", juce::dontSendNotification);
 
     addAndMakeVisible(m_reverb_room_size);
-    m_reverb_room_size.setRange(0.0f, 100.0f, 1.0f);
-    m_reverb_room_size.setValue(40.0f);
+    m_reverb_room_size.setRange(0.0f, 1.0f, 0.05f);
+    m_reverb_room_size.setValue(0.4f);
     m_reverb_room_size.setTextValueSuffix("%");
     m_reverb_room_size.setTextBoxStyle(Slider::TextBoxBelow, true, 50, 20);
     m_reverb_room_size.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
@@ -230,8 +230,8 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
     m_reverb_room_size_label.setText("room size", juce::dontSendNotification);
 
     addAndMakeVisible(m_reverb_damping);
-    m_reverb_damping.setRange(0.0f, 100.0f, 1.0f);
-    m_reverb_damping.setValue(40.0f);
+    m_reverb_damping.setRange(0.0f, 1.0f, 0.05f);
+    m_reverb_damping.setValue(0.4f);
     m_reverb_damping.setTextValueSuffix("%");
     m_reverb_damping.setTextBoxStyle(Slider::TextBoxBelow, true, 50, 20);
     m_reverb_damping.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
@@ -240,8 +240,8 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
     m_reverb_damping_label.setText("damping", juce::dontSendNotification);
 
     addAndMakeVisible(m_reverb_width);
-    m_reverb_width.setRange(0.0f, 100.0f, 1.0f);
-    m_reverb_width.setValue(40.0f);
+    m_reverb_width.setRange(0.0f, 1.0f, 0.05f);
+    m_reverb_width.setValue(0.4f);
     m_reverb_width.setTextValueSuffix("%");
     m_reverb_width.setTextBoxStyle(Slider::TextBoxBelow, true, 50, 20);
     m_reverb_width.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
@@ -250,8 +250,8 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
     m_reverb_width_label.setText("width", juce::dontSendNotification);
 
     addAndMakeVisible(m_reverb_wet_level);
-    m_reverb_wet_level.setRange(0.0f, 100.0f, 1.0f);
-    m_reverb_wet_level.setValue(40.0f);
+    m_reverb_wet_level.setRange(0.0f, 1.0f, 0.05f);
+    m_reverb_wet_level.setValue(0.4f);
     m_reverb_wet_level.setTextValueSuffix("%");
     m_reverb_wet_level.setTextBoxStyle(Slider::TextBoxBelow, true, 50, 20);
     m_reverb_wet_level.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
@@ -260,8 +260,8 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
     m_reverb_wet_level_label.setText("wet", juce::dontSendNotification);
 
     addAndMakeVisible(m_reverb_dry_level);
-    m_reverb_dry_level.setRange(0.0f, 100.0f, 1.0f);
-    m_reverb_dry_level.setValue(40.0f);
+    m_reverb_dry_level.setRange(0.0f, 1.0f, 0.05f);
+    m_reverb_dry_level.setValue(0.4f);
     m_reverb_dry_level.setTextValueSuffix("%");
     m_reverb_dry_level.setTextBoxStyle(Slider::TextBoxBelow, true, 50, 20);
     m_reverb_dry_level.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
