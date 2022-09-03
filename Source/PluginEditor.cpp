@@ -323,22 +323,22 @@ void ExodusAudioProcessorEditor::printComponents()
     m_reverb_buttons_label.setBounds(15, 620, 80, 50);
 
     m_delay_time.setBounds(90, 710, 90, 90);
-    m_delay_time_label.setBounds(60, 835, 90, 30);
+    m_delay_time_label.setBounds(90, 681, 90, 30);
     m_delay_feedback.setBounds(170, 710, 90, 90);
-    m_delay_feedback_label.setBounds(140, 835, 90, 30);
-    m_delay_mix.setBounds(290, 710, 90, 90);
-    m_delay_mix_label.setBounds(320, 835, 90, 30);
+    m_delay_feedback_label.setBounds(170, 681, 90, 30);
+    m_delay_mix.setBounds(250, 710, 90, 90);
+    m_delay_mix_label.setBounds(250, 681, 90, 30);
 
-    m_reverb_room_size.setBounds(400, 710, 90, 90);
-    m_reverb_room_size_label.setBounds(370, 835, 90, 30);
-    m_reverb_damping.setBounds(480, 710, 90, 90);
-    m_reverb_damping_label.setBounds(450, 835, 90, 30);
-    m_reverb_width.setBounds(560, 710, 90, 90);
-    m_reverb_width_label.setBounds(530, 835, 90, 30);
-    m_reverb_wet_level.setBounds(640, 710, 90, 90);
-    m_reverb_wet_level_label.setBounds(610, 835, 90, 30);
-    m_reverb_dry_level.setBounds(720, 710, 90, 90);
-    m_reverb_dry_level_label.setBounds(690, 835, 90, 30);
+    m_reverb_room_size.setBounds(500, 710, 90, 90);
+    m_reverb_room_size_label.setBounds(500, 681, 90, 30);
+    m_reverb_damping.setBounds(580, 710, 90, 90);
+    m_reverb_damping_label.setBounds(580, 681, 90, 30);
+    m_reverb_width.setBounds(660, 710, 90, 90);
+    m_reverb_width_label.setBounds(660, 681, 90, 30);
+    m_reverb_wet_level.setBounds(740, 710, 90, 90);
+    m_reverb_wet_level_label.setBounds(740, 681, 90, 30);
+    m_reverb_dry_level.setBounds(820, 710, 90, 90);
+    m_reverb_dry_level_label.setBounds(820, 681, 90, 30);
 
 
     audioProcessor.m_visualiser.setBounds(25, 100, 600, 280);
