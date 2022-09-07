@@ -8,6 +8,9 @@
     <GROUP id="{CCDE9D08-6271-F1B7-6EC9-3AEB45468EB1}" name="Source">
       <FILE id="AKdADo" name="MyReverb.cpp" compile="1" resource="0" file="Source/MyReverb.cpp"/>
       <FILE id="pluckT" name="MyReverb.h" compile="0" resource="0" file="Source/MyReverb.h"/>
+      <FILE id="MoIDoU" name="MyDistortion.cpp" compile="1" resource="0"
+            file="Source/MyDistortion.cpp"/>
+      <FILE id="IETnM0" name="MyDistortion.h" compile="0" resource="0" file="Source/MyDistortion.h"/>
       <FILE id="vdueYa" name="MyFilter.cpp" compile="1" resource="0" file="Source/MyFilter.cpp"/>
       <FILE id="W1RBgL" name="MyFilter.h" compile="0" resource="0" file="Source/MyFilter.h"/>
       <FILE id="mEi6gT" name="MyDelay.cpp" compile="1" resource="0" file="Source/MyDelay.cpp"/>

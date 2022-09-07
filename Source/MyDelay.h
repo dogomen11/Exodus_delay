@@ -31,9 +31,9 @@ class MyDelay
     private:
         AudioBuffer<float> delay_buffer;
         int delay_buffer_length;
+        double sample_rate;
         int on_off_marked = INSTENCE_OFF;
         int reverb_marked = INSTENCE_OFF;
-        double sample_rate;
         Parameters parameters;
         
     public:
