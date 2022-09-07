@@ -22,7 +22,8 @@ ExodusAudioProcessor::ExodusAudioProcessor()
                        ),
                     tree_state(*this, nullptr, "PARAMETER", create_parameter_layout()),
                     delay(), 
-                    reverb()
+                    reverb(),
+                    distortion()
 #endif
 {
 }
@@ -148,14 +149,16 @@ void ExodusAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
     m_visualiser.clear();
     m_visualiser_2.clear();
 
-    delay.setSize(getNumInputChannels(), (sampleRate + samplesPerBlock) * 2);
+    delay.setSize(getNumInputChannels(), (sampleRate * samplesPerBlock) * 2);
     delay.setSampleRate(sampleRate);
+    distortion.setSampleRate(sampleRate);
 
     dsp::ProcessSpec spec;
     spec.sampleRate = sampleRate;
     spec.maximumBlockSize = static_cast<juce::uint32>(samplesPerBlock);
     spec.numChannels = static_cast<juce::uint32> (getTotalNumOutputChannels());
     reverb.prepare(spec);
+    distortion.prepareFilter(spec);
 
 }
 
@@ -223,6 +226,7 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
         buffer.clear (i, 0, buffer.getNumSamples());
 
     int buffer_length = buffer.getNumSamples();
+    distortion.setSize(getNumInputChannels(), buffer_length);
 
     dsp::AudioBlock<float> audio_block{ buffer };
 
@@ -245,6 +249,11 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
             delay.fillDelayBuffer(channel, buffer_length, buffer_data, processor_buffer_write_pos);
             delay.getFromDelayBuffer(buffer, channel, buffer_length, delay.getNumSamples(), processor_buffer_write_pos);
             delay.feedbackDelay(channel, buffer_length, dry_buffer, processor_buffer_write_pos);
+        }
+
+        if (delay.getOnOffMarked() == 3)
+        {
+            distortion.process(buffer, channel, 0, audio_block);
         }
     }
 

@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "MyDelay.h"
+#include "MyDistortion.h"
 
 //==============================================================================
 /**
@@ -74,6 +75,8 @@ public:
     MyDelay::Parameters delay_params;
     dsp::Reverb reverb;
     dsp::Reverb::Parameters reverb_params;
+    MyDistortion distortion;
+    MyDistortion::Parameters dist_params;
     void updateDelaySettings();
     void updateReverbSettings();
     int current_instence = 0;
