@@ -162,3 +162,19 @@ void MyDelay::subReverbMarked(int instence)
     d_reverb[instence] = false;
     reverb_marked--;
 }
+
+void MyDelay::addDistMarked(int instence)
+{
+    if (d_on_off[instence] == false)
+    {
+        return;
+    }
+
+    d_dist[instence] = true;
+    dist_marked++;
+}
+void MyDelay::subDistMarked(int instence)
+{
+    d_dist[instence] = false;
+    dist_marked--;
+}

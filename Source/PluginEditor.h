@@ -60,11 +60,15 @@ private:
     // Reverb
     ToggleButton m_reverb_buttons[NUM_OF_INSTENCES];
 
+    // Distortion
+    ToggleButton m_dist_buttons[NUM_OF_INSTENCES];
+
     // Lables
     Label m_volume_dials_label;
     Label m_pan_dials_label;
     Label m_on_off_buttons_label;
     Label m_reverb_buttons_label;
+    Label m_dist_buttons_label;
 
     // Delay time
     Slider m_delay_time;
@@ -137,6 +141,7 @@ public:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_pan_dials_attach[NUM_OF_INSTENCES];
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> m_on_off_buttons_attach[NUM_OF_INSTENCES];
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> m_reverb_buttons_attach[NUM_OF_INSTENCES];
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> m_dist_buttons_attach[NUM_OF_INSTENCES];
 
     ExodusAudioProcessor& audioProcessor;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ExodusAudioProcessorEditor)

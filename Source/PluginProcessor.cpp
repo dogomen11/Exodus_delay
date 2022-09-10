@@ -74,6 +74,11 @@ AudioProcessorValueTreeState::ParameterLayout ExodusAudioProcessor::create_param
         std::string reverb_button_name = "m_reverb_button_name_";
         reverb_button_name.append(to_string(i));
         parameters.add((std::make_unique<AudioParameterBool>(reverb_button_id, reverb_button_name, false)));
+        std::string dist_button_id = "m_dist_button_id_";
+        dist_button_id.append(to_string(i));
+        std::string dist_button_name = "m_dist_button_name_";
+        dist_button_name.append(to_string(i));
+        parameters.add((std::make_unique<AudioParameterBool>(dist_button_id, dist_button_name, false)));
     }
 
     return parameters;
@@ -287,7 +292,7 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
             channelData[sample] = channelData[sample] * juce::Decibels::decibelsToGain(tree_state.getRawParameterValue("m_output_gain_id")->load());
         }
     }
-    //m_visualiser_2.pushBuffer(buffer);
+    m_visualiser_2.pushBuffer(buffer);
     
     processor_buffer_write_pos += buffer_length;
     processor_buffer_write_pos %= delay.getNumSamples();

@@ -34,11 +34,13 @@ class MyDelay
         double sample_rate;
         int on_off_marked = INSTENCE_OFF;
         int reverb_marked = INSTENCE_OFF;
+        int dist_marked = INSTENCE_OFF;
         Parameters parameters;
         
     public:
         bool d_on_off[NUM_OF_INSTENCES] = { INSTENCE_OFF };
         bool d_reverb[NUM_OF_INSTENCES] = { INSTENCE_OFF };
+        bool d_dist[NUM_OF_INSTENCES] = { INSTENCE_OFF };
 
         MyDelay();
         ~MyDelay() = default;
@@ -59,6 +61,8 @@ class MyDelay
         void subOnOffMarked(int instence);
         void addReverbMarked(int instence);
         void subReverbMarked(int instence);
+        void addDistMarked(int instence);
+        void subDistMarked(int instence);
 };
 
 #endif // MY_DELAY
