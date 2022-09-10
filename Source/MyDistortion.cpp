@@ -55,13 +55,10 @@ void MyDistortion::reset()
 
 float MyDistortion::distorter(float to_distort, float balance)
 {
-    if (to_distort > 0.0f)
-        to_distort += 0;
-    float dry_sample = to_distort;
-    to_distort += parameters.dist_drive * parameters.dist_wet;
-    to_distort = (2.f / float_Pi) * atan(to_distort);
-    to_distort = balance * dry_sample + (1 / balance) * to_distort;
-    return to_distort;
+    float dry_sample = to_distort, sign = to_distort/abs(to_distort);
+    float exponant = expf(to_distort);
+    to_distort = 1 - exponant;
+    return (to_distort * sign);
 }
 
 void MyDistortion::process(AudioBuffer<float>& buffer, int channel, int buffer_write_position, dsp::AudioBlock<float> audio_block)
@@ -70,8 +67,7 @@ void MyDistortion::process(AudioBuffer<float>& buffer, int channel, int buffer_w
     for (int i = 0; i < dist_buffer_length; i++)
     {
         float processed_sample = distorter(buffer.getSample(channel, i), balance);
-        if (processed_sample > 0.0f)
-            buffer.setSample(channel, i, processed_sample);
+        buffer.setSample(channel, i, processed_sample);
     }
     //buffer.copyFrom(channel, buffer_write_position, dist_buffer.getReadPointer(channel), dist_buffer_length);
     //dsp::ProcessContextReplacing<float> ctx(audio_block);
