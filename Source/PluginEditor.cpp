@@ -97,7 +97,8 @@ void ExodusAudioProcessorEditor::buttonClicked(Button* button)
             switch (m_reverb_buttons[i].getToggleState())
             {
             case true:
-                audioProcessor.delay.addReverbMarked(i);
+                if (audioProcessor.delay.addReverbMarked(i) == false)
+                    m_reverb_buttons[i].setToggleState(false, true);
                 break;
             case false:
                 audioProcessor.delay.subReverbMarked(i);
@@ -110,7 +111,9 @@ void ExodusAudioProcessorEditor::buttonClicked(Button* button)
             switch (m_dist_buttons[i].getToggleState())
             {
             case true:
-                audioProcessor.delay.addDistMarked(i);
+                if (audioProcessor.delay.addDistMarked(i) == false)
+                    m_dist_buttons[i].setToggleState(false, true);
+                
                 break;
             case false:
                 audioProcessor.delay.subDistMarked(i);

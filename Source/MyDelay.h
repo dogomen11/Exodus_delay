@@ -59,10 +59,10 @@ class MyDelay
         float getDelayMix()                 { return parameters.delay_mix; }
         void addOnOffMarked(int instence);
         void subOnOffMarked(int instence);
-        void addReverbMarked(int instence);
-        void subReverbMarked(int instence);
-        void addDistMarked(int instence);
-        void subDistMarked(int instence);
+        bool addReverbMarked(int instence);
+        bool subReverbMarked(int instence);
+        bool addDistMarked(int instence);
+        bool subDistMarked(int instence);
 };
 
 #endif // MY_DELAY

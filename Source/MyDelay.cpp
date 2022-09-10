@@ -147,34 +147,38 @@ void MyDelay::subOnOffMarked(int instence)
     d_reverb[instence] = false;
 }
 
-void MyDelay::addReverbMarked(int instence)
+bool MyDelay::addReverbMarked(int instence)
 {
     if (d_on_off[instence] == false)
     {
-        return;
+        return false;
     }
 
     d_reverb[instence] = true;
     reverb_marked++;
+    return true;
 }
-void MyDelay::subReverbMarked(int instence)
+bool MyDelay::subReverbMarked(int instence)
 {
     d_reverb[instence] = false;
     reverb_marked--;
+    return true;
 }
 
-void MyDelay::addDistMarked(int instence)
+bool MyDelay::addDistMarked(int instence)
 {
     if (d_on_off[instence] == false)
     {
-        return;
+        return false;
     }
 
     d_dist[instence] = true;
     dist_marked++;
+    return true;
 }
-void MyDelay::subDistMarked(int instence)
+bool MyDelay::subDistMarked(int instence)
 {
     d_dist[instence] = false;
     dist_marked--;
+    return true;
 }
