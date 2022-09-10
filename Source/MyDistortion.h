@@ -28,6 +28,7 @@ class MyDistortion
         int dist_buffer_length;
         double sample_rate;
         float balance;
+        float drive_mult;
         Parameters parameters;
         dsp::FirstOrderTPTFilter<float> brightness_filter;
 
@@ -41,6 +42,7 @@ class MyDistortion
         const Parameters& getParameters() const { return parameters; }
         void setParameters(const Parameters& new_params);
         void setBalance();
+        void setDriveMult();
         void prepareFilter(const dsp::ProcessSpec& spec);
         void reset();
         float distorter(float to_distort, float balance);

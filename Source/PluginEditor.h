@@ -98,6 +98,22 @@ private:
     Slider m_reverb_dry_level;
     Label m_reverb_dry_level_label;
 
+    //Dist drive
+    Slider m_dist_drive;
+    Label m_dist_drive_label;
+
+    //Dist dry level
+    Slider m_dist_dry_level;
+    Label m_dist_dry_level_label;
+
+    //Dist wet level
+    Slider m_dist_wet_level;
+    Label m_dist_wet_level_label;
+
+    //Dist brightness
+    Slider m_dist_brightness;
+    Label m_dist_brightness_label;
+
     // Backgroungd 
     ImageComponent m_background;
 
@@ -113,6 +129,10 @@ public:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_reverb_width_attach;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_reverb_wet_level_attach;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_reverb_dry_level_attach;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_dist_drive_attach;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_dist_brightness_attach;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_dist_wet_level_attach;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_dist_dry_level_attach;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_volume_dials_attach[NUM_OF_INSTENCES];
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_pan_dials_attach[NUM_OF_INSTENCES];
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> m_on_off_buttons_attach[NUM_OF_INSTENCES];

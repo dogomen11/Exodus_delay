@@ -36,11 +36,17 @@ void MyDistortion::setParameters(const Parameters& new_params)
     parameters.dist_wet = new_params.dist_wet;
     parameters.dist_brightness = new_params.dist_brightness;
     setBalance();
+    setDriveMult();
 }
 
 void MyDistortion::setBalance()
 {
     balance = parameters.dist_dry / parameters.dist_wet;
+}
+
+void MyDistortion::setDriveMult()
+{
+    drive_mult = 1 + sqrtf(2 * parameters.dist_drive);
 }
 
 void MyDistortion::prepareFilter(const dsp::ProcessSpec& spec)
@@ -55,10 +61,13 @@ void MyDistortion::reset()
 
 float MyDistortion::distorter(float to_distort, float balance)
 {
-    float dry_sample = to_distort, sign = to_distort/abs(to_distort);
-    float exponant = expf(to_distort);
-    to_distort = 1 - exponant;
-    return (to_distort * sign);
+    if (to_distort == 0)
+        return 0;
+
+    float dry_sample = to_distort, sign = to_distort / abs(to_distort);
+    float exponant = expf(to_distort * drive_mult);
+    to_distort = (1 - exponant) * sign;
+    return dry_sample * parameters.dist_dry + to_distort * parameters.dist_wet;
 }
 
 void MyDistortion::process(AudioBuffer<float>& buffer, int channel, int buffer_write_position, dsp::AudioBlock<float> audio_block)

@@ -79,6 +79,7 @@ public:
     MyDistortion::Parameters dist_params;
     void updateDelaySettings();
     void updateReverbSettings();
+    void updateDistortionSettings();
     int current_instence = 0;
     int processor_buffer_write_pos = 0;
     void promoteInstence();
