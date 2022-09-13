@@ -12,7 +12,7 @@
 
 float calculatePanMargin(float pan, int channel);
 
-MyDelay::MyDelay()
+MyDelay::MyDelay() : reverb(), distortion()
 {
     delay_buffer.clear();
 }
@@ -36,6 +36,53 @@ void MyDelay::setSampleRate(double new_sample_rate)
     sample_rate = new_sample_rate;
 }
 
+void MyDelay::applyFX(int channel, AudioBuffer<float>& buffer)
+{
+    AudioBuffer<float> temp_delay_buffer;
+    temp_delay_buffer.makeCopyOf(delay_buffer);
+    applyVolume(channel, temp_delay_buffer);
+    applyDist(channel, temp_delay_buffer);
+    applyReverb(channel, temp_delay_buffer);
+    applyPan(channel, temp_delay_buffer);
+}
+
+void MyDelay::applyVolume(int channel, AudioBuffer<float>& temp_delay_buffer)
+{
+    float* channelData = temp_delay_buffer.getWritePointer(channel);
+    for (int sample = 0; sample < temp_delay_buffer.getNumSamples(); ++sample)
+    {
+        channelData[sample] = temp_delay_buffer.getSample(channel, sample) * parameters.delay_volume;
+    }
+}
+
+void MyDelay::applyPan(int channel, AudioBuffer<float>& temp_delay_buffer)
+{
+    float pan_mult = 1;
+    float* channelData = temp_delay_buffer.getWritePointer(channel);
+    if (parameters.delay_pan != 0)
+    {
+        pan_mult = calculatePanMargin(parameters.delay_pan, channel);
+    }
+    for (int sample = 0; sample < temp_delay_buffer.getNumSamples(); ++sample)
+    {
+        channelData[sample] = temp_delay_buffer.getSample(channel, sample) * pan_mult;
+    }
+}
+
+void MyDelay::applyReverb(int channel, AudioBuffer<float>& temp_delay_buffer)
+{
+    dsp::AudioBlock<float> audio_block{ temp_delay_buffer };
+    juce::dsp::ProcessContextReplacing<float> ctx(audio_block);
+    reverb.process(ctx);
+}
+
+void MyDelay::applyDist(int channel, AudioBuffer<float>& temp_delay_buffer)
+{
+    distortion.process(temp_delay_buffer, channel);
+}
+
+
+
 void MyDelay::fillDelayBuffer(int channel, const int buffer_length, const float* buffer_data, int buffer_write_position)
 {
     if (delay_buffer_length > buffer_length + buffer_write_position)
@@ -56,7 +103,7 @@ void MyDelay::getFromDelayBuffer(AudioBuffer<float>& buffer, int channel, const 
     jassert(delay_buffer.getArrayOfReadPointers() != nullptr);
     const int read_position = static_cast<int> (delay_buffer_length + buffer_write_position - (sample_rate * parameters.delay_time / 1000)) % delay_buffer_length;
     const float* delay_buffer_data = delay_buffer.getReadPointer(channel);
-
+    applyFX(channel, buffer);
 
 
     if (delay_buffer_length > buffer_length + read_position)
@@ -86,26 +133,6 @@ void MyDelay::feedbackDelay(int channel, const int buffer_length, float* dry_buf
     }
 }
 
-
-void MyDelay::applyPan(AudioBuffer<float>& temp, bool instence, float* channelData, int channel, float volume, float pan)
-{
-    float pan_mult = 1;
-    if (pan != 0)
-    {
-        pan_mult = calculatePanMargin(pan, channel);
-    }
-    for (int sample = 0; sample < temp.getNumSamples(); ++sample)
-    {
-        if (instence == 1)
-        {
-            channelData[sample] = temp.getSample(channel, sample) * volume * pan_mult;
-        }
-        else
-        {
-            channelData[sample] = temp.getSample(channel, sample) * 0;
-        }
-    }
-}
 
 float MyDelay::calculatePanMargin(float pan, int channel)
 {

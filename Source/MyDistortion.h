@@ -47,6 +47,6 @@ class MyDistortion
         void prepareFilter(const dsp::ProcessSpec& spec);
         void reset();
         float distorter(float to_distort, float balance);
-        void process(AudioBuffer<float>& buffer, int channel, int buffer_write_positions, dsp::AudioBlock<float> audio_block);
+        void process(AudioBuffer<float>& buffer, int channel);
 
 };

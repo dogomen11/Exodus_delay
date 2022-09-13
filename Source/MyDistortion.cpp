@@ -72,7 +72,7 @@ float MyDistortion::distorter(float to_distort, float balance)
     return dry_sample * parameters.dist_dry + to_distort * parameters.dist_wet;
 }
 
-void MyDistortion::process(AudioBuffer<float>& buffer, int channel, int buffer_write_position, dsp::AudioBlock<float> audio_block)
+void MyDistortion::process(AudioBuffer<float>& buffer, int channel)
 {
     for (int i = 0; i < dist_buffer_length; i++)
     {

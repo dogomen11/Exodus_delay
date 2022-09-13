@@ -74,10 +74,6 @@ public:
 
     MyDelay delay;
     MyDelay::Parameters delay_params;
-    dsp::Reverb reverb;
-    dsp::Reverb::Parameters reverb_params;
-    MyDistortion distortion;
-    MyDistortion::Parameters dist_params;
     void updateDelaySettings();
     void updateReverbSettings();
     void updateDistortionSettings();

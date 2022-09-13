@@ -12,7 +12,9 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "MyDistortion.h"
 using namespace juce;
+
 #define NUM_OF_INSTENCES 16
 #define INSTENCE_ON 1
 #define INSTENCE_OFF 0
@@ -23,9 +25,11 @@ class MyDelay
     public: 
         struct Parameters
         {
-            float delay_mix = 0.5f;
+            float delay_mix = 0.7f;
             float delay_time = 0.5f;
             float delay_feedback = 0.33f;
+            float delay_volume = 1.0f;
+            float delay_pan = 0.0f;
         };
 
     private:
@@ -41,6 +45,10 @@ class MyDelay
         bool d_on_off[NUM_OF_INSTENCES] = { INSTENCE_OFF };
         bool d_reverb[NUM_OF_INSTENCES] = { INSTENCE_OFF };
         bool d_dist[NUM_OF_INSTENCES] = { INSTENCE_OFF };
+        dsp::Reverb reverb;
+        dsp::Reverb::Parameters reverb_params;
+        MyDistortion distortion;
+        MyDistortion::Parameters dist_params;
 
         MyDelay();
         ~MyDelay() = default;
@@ -50,7 +58,11 @@ class MyDelay
         void fillDelayBuffer(int channel, const int buffer_length, const float* buffer_data, int buffer_write_position);
         void getFromDelayBuffer(AudioBuffer<float>& buffer, int channel, const int buffer_length, const int delay_buffer_length, int buffer_write_position);
         void feedbackDelay(int channel, const int buffer_length, float* dry_buffer, int buffer_write_position);
-        void applyPan(AudioBuffer<float>& temp, bool instence, float* channelData, int channel, float volume, float pan);
+        void applyFX(int channel, AudioBuffer<float>& buffer);
+        void applyPan(int channel, AudioBuffer<float>& delay_buffer);
+        void applyVolume(int channel, AudioBuffer<float>& delay_buffer);
+        void applyReverb(int channel, AudioBuffer<float>& delay_buffer);
+        void applyDist(int channel, AudioBuffer<float>& delay_buffer);
         float calculatePanMargin(float pan, int channel);
         int getOnOffMarked()                { return on_off_marked; }
         int getReverbMarked()               { return reverb_marked; }
