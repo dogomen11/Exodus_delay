@@ -47,7 +47,7 @@ AudioProcessorValueTreeState::ParameterLayout ExodusAudioProcessor::create_param
     parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_wet_level_id",  "m_reverb_wet_level_name",  NormalisableRange<float>(0.0,   1.0, 0.05), 0.4)));
     parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_dry_level_id",  "m_reverb_dry_level_name",  NormalisableRange<float>(0.0,   1.0, 0.05), 0.4)));
     parameters.add((std::make_unique<AudioParameterFloat>("m_dist_drive_id",        "m_dist_drive_name",        NormalisableRange<float>(0.0,   1.0, 0.05), 0.4)));
-    parameters.add((std::make_unique<AudioParameterFloat>("m_dist_brightness_id",   "m_dist_brightness_name",   NormalisableRange<float>(300.0, 20000.0,   10.0), 400.0)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_dist_brightness_id",   "m_dist_brightness_name",   NormalisableRange<float>(40.0, 20000.0, 1.0, 1.0), 8192.0f)));
     parameters.add((std::make_unique<AudioParameterFloat>("m_dist_wet_level_id",    "m_dist_wet_level_name",    NormalisableRange<float>(0.0,   1.0, 0.05), 0.4)));
     parameters.add((std::make_unique<AudioParameterFloat>("m_dist_dry_level_id",    "m_dist_dry_level_name",    NormalisableRange<float>(0.0,   1.0, 0.05), 0.4)));
 

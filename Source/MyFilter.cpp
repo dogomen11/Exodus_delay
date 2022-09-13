@@ -183,8 +183,8 @@ void LowpassHighpassFilter::process(juce::AudioBuffer<float>& buffer, int channe
         const auto a1 = (tan - 1.f) / (tan + 1.f);
         const auto inputSample = channelSamples[i];
         const auto allpassFilteredSample = a1 * inputSample + dnBuffer[channel];
-        dnBuffer[channel] = inputSample - a1 * allpassFilteredSample;
-        const auto filterOutput = 0.5f * (inputSample + allpassFilteredSample);
+        dnBuffer[channel] = inputSample + a1 * allpassFilteredSample;
+        const auto filterOutput = 0.65f * (inputSample + allpassFilteredSample);
         channelSamples[i] = filterOutput;
     }
 }

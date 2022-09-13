@@ -296,9 +296,9 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
     m_dist_drive_label.setText("drive", juce::dontSendNotification);
 
     addAndMakeVisible(m_dist_brightness);
-    m_dist_brightness.setRange(300.0f, 20000.0f, 10.0f);
-    m_dist_brightness.setValue(400.0f);
-    m_dist_brightness.setSkewFactorFromMidPoint(8000.f);
+    m_dist_brightness.setRange(40.0f, 20000.0f, 1.0f);
+    m_dist_brightness.setValue(8192.0f);
+    m_dist_brightness.setSkewFactorFromMidPoint(8192.f);
     m_dist_brightness.setTextValueSuffix("Hz");
     m_dist_brightness.setTextBoxStyle(Slider::TextBoxBelow, true, 50, 20);
     m_dist_brightness.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);

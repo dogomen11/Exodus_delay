@@ -74,7 +74,6 @@ float MyDistortion::distorter(float to_distort, float balance)
 
 void MyDistortion::process(AudioBuffer<float>& buffer, int channel, int buffer_write_position, dsp::AudioBlock<float> audio_block)
 {
-    //brightness_filter.setCutoffFrequency(exp(log(20) + (log(20000) - log(20)) * parameters.dist_brightness));
     for (int i = 0; i < dist_buffer_length; i++)
     {
         float processed_sample = distorter(buffer.getSample(channel, i), balance);
