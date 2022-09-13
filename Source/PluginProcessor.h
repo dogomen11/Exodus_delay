@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "MyDelay.h"
 #include "MyDistortion.h"
+#include "MyFilter.h"
 
 //==============================================================================
 /**

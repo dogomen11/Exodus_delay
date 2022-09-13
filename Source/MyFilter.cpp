@@ -13,7 +13,7 @@
 
 MyFilter::MyFilter()
 {
-    logic = MOOG_FILTER;
+    logic = YOUTUBE_FILTER;
     y_a = 0;
     y_b = 0;
     y_c = 0;
@@ -154,5 +154,37 @@ void MyFilter::moogFilter(int channel, float* buffer, float* tmp, int buffer_len
         y_d_1 = y_d;
         y_d = y_d + g * (tanhf(y_c) - tanhf(y_d));
         buffer[i / 2] = y_d;
+    }
+}
+
+
+
+// LowpassHighpassFilter.cpp**************************************************//
+
+void LowpassHighpassFilter::setHighpass(bool highpass) {
+    this->highpass = highpass;
+}
+
+void LowpassHighpassFilter::setCutoffFrequency(float cutoffFrequency) {
+    this->cutoffFrequency = cutoffFrequency;
+}
+
+void LowpassHighpassFilter::setSamplingRate(float samplingRate) {
+    this->samplingRate = samplingRate;
+}
+
+void LowpassHighpassFilter::process(juce::AudioBuffer<float>& buffer, int channel) 
+{
+    dnBuffer.resize(buffer.getNumChannels(), 0.f);
+    auto channelSamples = buffer.getWritePointer(channel);
+    for (auto i = 0; i < buffer.getNumSamples(); ++i) 
+    {
+        const auto tan = std::tan(M_PI * cutoffFrequency / samplingRate);
+        const auto a1 = (tan - 1.f) / (tan + 1.f);
+        const auto inputSample = channelSamples[i];
+        const auto allpassFilteredSample = a1 * inputSample + dnBuffer[channel];
+        dnBuffer[channel] = inputSample - a1 * allpassFilteredSample;
+        const auto filterOutput = 0.5f * (inputSample + allpassFilteredSample);
+        channelSamples[i] = filterOutput;
     }
 }

@@ -10,6 +10,7 @@
 
 #pragma once
 #include <JuceHeader.h>
+#include "MyFilter.h"
 
 using namespace juce;
 
@@ -30,7 +31,7 @@ class MyDistortion
         float balance;
         float drive_mult;
         Parameters parameters;
-        dsp::FirstOrderTPTFilter<float> brightness_filter;
+        LowpassHighpassFilter brightness_filter;
 
 
     public:

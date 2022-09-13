@@ -16,6 +16,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <vector>
 #include <JuceHeader.h>
 
 using namespace juce;
@@ -28,7 +29,8 @@ enum filter_logic
     THREE_TERM_AVG_FILTER,
     CENTRAL_DIFF_FILTER,
     RECURSIVR_FILTER,
-    MOOG_FILTER
+    MOOG_FILTER,
+    YOUTUBE_FILTER,
 };
 
 
@@ -71,6 +73,26 @@ public:
     void recursiveFilter(int channel, float* buffer, float* tmp, int buffer_length);
     void moogFilter(int channel, float* buffer, float* tmp, int buffer_length);
 
+};
+
+
+
+// LowpassHighpassFilter.h ****************************************************************************//
+
+
+class LowpassHighpassFilter
+{
+public:
+    void setHighpass(bool highpass);
+    void setCutoffFrequency(float cutoffFrequency);
+    void setSamplingRate(float samplingRate);
+    void process(juce::AudioBuffer<float>&, int channel);
+
+private:
+    bool highpass;
+    float cutoffFrequency;
+    float samplingRate;
+    std::vector<float> dnBuffer;
 };
 
 #endif

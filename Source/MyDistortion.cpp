@@ -14,13 +14,14 @@ using namespace juce;
 MyDistortion::MyDistortion()
 {
     dist_buffer.clear();
-    brightness_filter.reset();
+    brightness_filter.setHighpass(true);
     balance = parameters.dist_dry / parameters.dist_wet;
 }
 
 void MyDistortion::setSampleRate(double new_sample_rate)
 {
     sample_rate = new_sample_rate;
+    brightness_filter.setSamplingRate(sample_rate);
 }
 
 void MyDistortion::setSize(int new_num_channels, int new_num_samples)
@@ -37,6 +38,7 @@ void MyDistortion::setParameters(const Parameters& new_params)
     parameters.dist_brightness = new_params.dist_brightness;
     setBalance();
     setDriveMult();
+    brightness_filter.setCutoffFrequency(parameters.dist_brightness);
 }
 
 void MyDistortion::setBalance()
@@ -51,7 +53,7 @@ void MyDistortion::setDriveMult()
 
 void MyDistortion::prepareFilter(const dsp::ProcessSpec& spec)
 {
-    brightness_filter.prepare(spec);
+    brightness_filter.setCutoffFrequency(parameters.dist_brightness);
 }
 
 void MyDistortion::reset() 
@@ -72,13 +74,11 @@ float MyDistortion::distorter(float to_distort, float balance)
 
 void MyDistortion::process(AudioBuffer<float>& buffer, int channel, int buffer_write_position, dsp::AudioBlock<float> audio_block)
 {
-    brightness_filter.setCutoffFrequency(exp(log(20) + (log(20000) - log(20)) * parameters.dist_brightness));
+    //brightness_filter.setCutoffFrequency(exp(log(20) + (log(20000) - log(20)) * parameters.dist_brightness));
     for (int i = 0; i < dist_buffer_length; i++)
     {
         float processed_sample = distorter(buffer.getSample(channel, i), balance);
         buffer.setSample(channel, i, processed_sample);
     }
-    //buffer.copyFrom(channel, buffer_write_position, dist_buffer.getReadPointer(channel), dist_buffer_length);
-    //dsp::ProcessContextReplacing<float> ctx(audio_block);
-    //brightness_filter.process(ctx);
+    brightness_filter.process(buffer, channel);
 }

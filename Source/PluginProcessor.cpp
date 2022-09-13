@@ -38,18 +38,18 @@ AudioProcessorValueTreeState::ParameterLayout ExodusAudioProcessor::create_param
 
     parameters.add((std::make_unique<AudioParameterFloat>("m_input_gain_id",        "m_input_gain_name",        NormalisableRange<float>(-60.0, 6.0, 1.0), 0.0)));
     parameters.add((std::make_unique<AudioParameterFloat>("m_output_gain_id",       "m_output_gain_name",       NormalisableRange<float>(-60.0, 6.0, 1.0), 0.0)));
-    parameters.add((std::make_unique<AudioParameterFloat>("m_delay_time_id",        "m_delay_time_name",        NormalisableRange<float>(0.0, 1500.0, 1.0), 500.0)));
-    parameters.add((std::make_unique<AudioParameterFloat>("m_delay_feedback_id",    "m_delay_feedback_name",    NormalisableRange<float>(0.0, 0.85, 0.01), 0.42)));
-    parameters.add((std::make_unique<AudioParameterFloat>("m_delay_mix_id",         "m_delay_mix_name",         NormalisableRange<float>(0.0, 100.0, 1.0), 40.0)));
-    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_room_size_id",  "m_reverb_room_size_name",  NormalisableRange<float>(0.0, 1.0, 0.05), 0.4)));
-    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_damping_id",    "m_reverb_damping_name",    NormalisableRange<float>(0.0, 1.0, 0.05), 0.4)));
-    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_width_id",      "m_reverb_width_name",      NormalisableRange<float>(0.0, 1.0, 0.05), 0.4)));
-    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_wet_level_id",  "m_reverb_wet_level_name",  NormalisableRange<float>(0.0, 1.0, 0.05), 0.4)));
-    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_dry_level_id",  "m_reverb_dry_level_name",  NormalisableRange<float>(0.0, 1.0, 0.05), 0.4)));
-    parameters.add((std::make_unique<AudioParameterFloat>("m_dist_drive_id",        "m_dist_drive_name",        NormalisableRange<float>(0.0, 1.0, 0.05), 0.4)));
-    parameters.add((std::make_unique<AudioParameterFloat>("m_dist_brightness_id",   "m_dist_brightness_name",   NormalisableRange<float>(0.0, 1.0, 0.05), 0.4)));
-    parameters.add((std::make_unique<AudioParameterFloat>("m_dist_wet_level_id",    "m_dist_wet_level_name",    NormalisableRange<float>(0.0, 1.0, 0.05), 0.4)));
-    parameters.add((std::make_unique<AudioParameterFloat>("m_dist_dry_level_id",    "m_dist_dry_level_name",    NormalisableRange<float>(0.0, 1.0, 0.05), 0.4)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_delay_time_id",        "m_delay_time_name",        NormalisableRange<float>(0.0,   1500.0, 1.0), 500.0)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_delay_feedback_id",    "m_delay_feedback_name",    NormalisableRange<float>(0.0,   0.85, 0.01), 0.42)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_delay_mix_id",         "m_delay_mix_name",         NormalisableRange<float>(0.0,   100.0, 1.0), 40.0)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_room_size_id",  "m_reverb_room_size_name",  NormalisableRange<float>(0.0,   1.0, 0.05), 0.4)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_damping_id",    "m_reverb_damping_name",    NormalisableRange<float>(0.0,   1.0, 0.05), 0.4)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_width_id",      "m_reverb_width_name",      NormalisableRange<float>(0.0,   1.0, 0.05), 0.4)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_wet_level_id",  "m_reverb_wet_level_name",  NormalisableRange<float>(0.0,   1.0, 0.05), 0.4)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_reverb_dry_level_id",  "m_reverb_dry_level_name",  NormalisableRange<float>(0.0,   1.0, 0.05), 0.4)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_dist_drive_id",        "m_dist_drive_name",        NormalisableRange<float>(0.0,   1.0, 0.05), 0.4)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_dist_brightness_id",   "m_dist_brightness_name",   NormalisableRange<float>(300.0, 20000.0,   10.0), 400.0)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_dist_wet_level_id",    "m_dist_wet_level_name",    NormalisableRange<float>(0.0,   1.0, 0.05), 0.4)));
+    parameters.add((std::make_unique<AudioParameterFloat>("m_dist_dry_level_id",    "m_dist_dry_level_name",    NormalisableRange<float>(0.0,   1.0, 0.05), 0.4)));
 
 
     for (int i = 0; i < NUM_OF_INSTENCES; i++)
@@ -167,7 +167,6 @@ void ExodusAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
     spec.maximumBlockSize = static_cast<juce::uint32>(samplesPerBlock);
     spec.numChannels = static_cast<juce::uint32> (getTotalNumOutputChannels());
     reverb.prepare(spec);
-    distortion.prepareFilter(spec);
 
 }
 
