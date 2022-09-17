@@ -33,7 +33,7 @@ class MyDelay
         };
 
     private:
-        AudioBuffer<float> delay_buffer;
+        AudioBuffer<float> dry_delay_buffer, wet_delay_buffer;
         int delay_buffer_length;
         double sample_rate;
         int on_off_marked = INSTENCE_OFF;
@@ -59,14 +59,14 @@ class MyDelay
         void getFromDelayBuffer(AudioBuffer<float>& buffer, int channel, const int buffer_length, const int delay_buffer_length, int buffer_write_position);
         void feedbackDelay(int channel, const int buffer_length, float* dry_buffer, int buffer_write_position);
         void applyFX(int channel, AudioBuffer<float>& buffer);
-        void applyPan(int channel, AudioBuffer<float>& delay_buffer);
-        void applyVolume(int channel, AudioBuffer<float>& delay_buffer);
-        void applyReverb(int channel, AudioBuffer<float>& delay_buffer);
-        void applyDist(int channel, AudioBuffer<float>& delay_buffer);
+        void applyPan(int channel, AudioBuffer<float>& buffer);
+        void applyVolume(int channel, AudioBuffer<float>& buffer);
+        void applyReverb(int channel, AudioBuffer<float>& buffer);
+        void applyDist(int channel, AudioBuffer<float>& buffer);
         float calculatePanMargin(float pan, int channel);
         int getOnOffMarked()                { return on_off_marked; }
         int getReverbMarked()               { return reverb_marked; }
-        int getNumSamples()                 { return delay_buffer.getNumSamples(); }
+        int getNumSamples()                 { return dry_delay_buffer.getNumSamples(); }
         float getDelayTime()                { return parameters.delay_time; }
         float getDelayMix()                 { return parameters.delay_mix; }
         void addOnOffMarked(int instence);
