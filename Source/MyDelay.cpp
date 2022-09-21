@@ -38,17 +38,15 @@ void MyDelay::setSampleRate(double new_sample_rate)
     sample_rate = new_sample_rate;
 }
 
-void MyDelay::applyFX(int channel, AudioBuffer<float>& buffer)
+void MyDelay::applyFX(int channel)
 {
-
-    wet_delay_buffer = dry_delay_buffer;
-    //applyVolume(channel, wet_delay_buffer);
-    applyDist(channel, dry_delay_buffer);
-    //applyReverb(channel, wet_delay_buffer);
-    //applyPan(channel, wet_delay_buffer);
+    //applyVolume(channel);
+    //applyDist(channel);
+    //applyReverb(channel);
+    //applyPan(channel);
 }
 
-void MyDelay::applyVolume(int channel, AudioBuffer<float>& wet_delay_buffer)
+void MyDelay::applyVolume(int channel)
 {
     float* channelData = wet_delay_buffer.getWritePointer(channel);
     for (int sample = 0; sample < wet_delay_buffer.getNumSamples(); ++sample)
@@ -57,7 +55,7 @@ void MyDelay::applyVolume(int channel, AudioBuffer<float>& wet_delay_buffer)
     }
 }
 
-void MyDelay::applyPan(int channel, AudioBuffer<float>& wet_delay_buffer)
+void MyDelay::applyPan(int channel)
 {
     float pan_mult = 1;
     float* channelData = wet_delay_buffer.getWritePointer(channel);
@@ -72,14 +70,14 @@ void MyDelay::applyPan(int channel, AudioBuffer<float>& wet_delay_buffer)
     }
 }
 
-void MyDelay::applyReverb(int channel, AudioBuffer<float>& wet_delay_buffer)
+void MyDelay::applyReverb(int channel)
 {
     dsp::AudioBlock<float> audio_block{ wet_delay_buffer };
     juce::dsp::ProcessContextReplacing<float> ctx(audio_block);
     reverb.process(ctx);
 }
 
-void MyDelay::applyDist(int channel, AudioBuffer<float>& wet_delay_buffer)
+void MyDelay::applyDist(int channel)
 {
     distortion.process(wet_delay_buffer, channel);
 }
@@ -90,30 +88,34 @@ void MyDelay::fillDelayBuffer(int channel, const int buffer_length, const float*
     if (delay_buffer_length > buffer_length + buffer_write_position)
     {
         dry_delay_buffer.copyFromWithRamp(channel, buffer_write_position, buffer_data, buffer_length, parameters.delay_feedback, parameters.delay_feedback);
+        wet_delay_buffer.copyFromWithRamp(channel, buffer_write_position, buffer_data, buffer_length, parameters.delay_feedback, parameters.delay_feedback);
     }
     else
     {
         const int buffer_remaining = delay_buffer_length - buffer_write_position;
         dry_delay_buffer.copyFromWithRamp(channel, buffer_write_position, buffer_data, buffer_remaining, parameters.delay_feedback, parameters.delay_feedback);
+        wet_delay_buffer.copyFromWithRamp(channel, buffer_write_position, buffer_data, buffer_remaining, parameters.delay_feedback, parameters.delay_feedback);
         dry_delay_buffer.copyFromWithRamp(channel, 0, buffer_data, (buffer_length - buffer_remaining), parameters.delay_feedback, parameters.delay_feedback);
+        wet_delay_buffer.copyFromWithRamp(channel, 0, buffer_data, (buffer_length - buffer_remaining), parameters.delay_feedback, parameters.delay_feedback);
     }
 }
 
 
 void MyDelay::getFromDelayBuffer(AudioBuffer<float>& buffer, int channel, const int buffer_length, const int delay_buffer_length, int buffer_write_position)
 {
-    applyFX(channel, buffer);
     const int read_position = static_cast<int> (delay_buffer_length + buffer_write_position - (sample_rate * parameters.delay_time / 1000)) % delay_buffer_length;
-    const float* wet_delay_buffer_data = wet_delay_buffer.getReadPointer(channel);
+    const float* delay_buffer_data = wet_delay_buffer.getReadPointer(channel);
+    //applyFX(channel);
+    //applyReverb(channel);
     if (delay_buffer_length > buffer_length + read_position)
     {
-        buffer.addFrom(channel, 0, wet_delay_buffer_data + read_position, buffer_length, powf((parameters.delay_mix / 100), 1.5));  //TODO: change delay mix divider
+        buffer.addFrom(channel, 0, delay_buffer_data + read_position, buffer_length, powf((parameters.delay_mix / 100), 1.5));  //TODO: change delay mix divider
     }
     else
     {
         const int buffer_remaining = delay_buffer_length - read_position;
-        buffer.copyFrom(channel, 0, wet_delay_buffer_data + read_position, buffer_remaining, powf((parameters.delay_mix / 100), 1.5));
-        buffer.copyFrom(channel, buffer_remaining, wet_delay_buffer_data, buffer_length - buffer_remaining, powf((parameters.delay_mix / 100), 1.5));
+        buffer.copyFrom(channel, 0, delay_buffer_data + read_position, buffer_remaining, powf((parameters.delay_mix / 100), 1.5));
+        buffer.copyFrom(channel, buffer_remaining, delay_buffer_data, buffer_length - buffer_remaining, powf((parameters.delay_mix / 100), 1.5));
     }
 }
 

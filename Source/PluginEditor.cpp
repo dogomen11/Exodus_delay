@@ -330,6 +330,7 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
         addAndMakeVisible(m_volume_dials[i]);
         m_volume_dials[i].setRange(0.0f, 1.5f, 0.01f);
         m_volume_dials[i].setValue(1.0f);
+        m_input_gain.setSkewFactorFromMidPoint(1.0f);
         m_volume_dials[i].setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
         m_volume_dials[i].setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
         m_volume_dials[i].setOpaque(false);

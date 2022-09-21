@@ -252,8 +252,6 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
     int buffer_length = buffer.getNumSamples();
     delay.distortion.setSize(getNumInputChannels(), buffer_length);
 
-    dsp::AudioBlock<float> audio_block{ buffer };
-
     m_visualiser.pushBuffer(buffer);
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
@@ -264,16 +262,12 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
             channelData[sample] = channelData[sample] * juce::Decibels::decibelsToGain(tree_state.getRawParameterValue("m_input_gain_id")->load());
         }
 
-        float* dry_buffer = buffer.getWritePointer(channel);
+        float*       dry_buffer  = buffer.getWritePointer(channel);
         const float* buffer_data = buffer.getReadPointer(channel);
-        AudioBuffer<float> tmp = buffer;
 
-        if (delay.getOnOffMarked() == 1)
-        {
-            delay.fillDelayBuffer(channel, buffer_length, buffer_data, processor_buffer_write_pos);
-            delay.getFromDelayBuffer(buffer, channel, buffer_length, delay.getNumSamples(), processor_buffer_write_pos);
-            delay.feedbackDelay(channel, buffer_length, dry_buffer, processor_buffer_write_pos);
-        }
+        delay.fillDelayBuffer(channel, buffer_length, buffer_data, processor_buffer_write_pos);
+        delay.getFromDelayBuffer(buffer, channel, buffer_length, delay.getNumSamples(), processor_buffer_write_pos);
+        delay.feedbackDelay(channel, buffer_length, dry_buffer, processor_buffer_write_pos);
     }
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
@@ -281,7 +275,7 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
         auto* channelData = buffer.getWritePointer(channel);
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
         {
-            channelData[sample] = channelData[sample] * juce::Decibels::decibelsToGain(tree_state.getRawParameterValue("m_output_gain_id")->load());
+            channelData[sample] = channelData[sample] * juce::Decibels::decibelsToGain(tree_state.getRawParameterValue("m_output_gain_id")->load()) * delay_params.delay_volume;
         }
     }
     m_visualiser_2.pushBuffer(buffer);

@@ -58,11 +58,11 @@ class MyDelay
         void fillDelayBuffer(int channel, const int buffer_length, const float* buffer_data, int buffer_write_position);
         void getFromDelayBuffer(AudioBuffer<float>& buffer, int channel, const int buffer_length, const int delay_buffer_length, int buffer_write_position);
         void feedbackDelay(int channel, const int buffer_length, float* dry_buffer, int buffer_write_position);
-        void applyFX(int channel, AudioBuffer<float>& buffer);
-        void applyPan(int channel, AudioBuffer<float>& buffer);
-        void applyVolume(int channel, AudioBuffer<float>& buffer);
-        void applyReverb(int channel, AudioBuffer<float>& buffer);
-        void applyDist(int channel, AudioBuffer<float>& buffer);
+        void applyFX(int channel);
+        void applyPan(int channel);
+        void applyVolume(int channel);
+        void applyReverb(int channel);
+        void applyDist(int channel);
         float calculatePanMargin(float pan, int channel);
         int getOnOffMarked()                { return on_off_marked; }
         int getReverbMarked()               { return reverb_marked; }
