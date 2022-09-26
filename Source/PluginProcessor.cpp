@@ -20,8 +20,7 @@ ExodusAudioProcessor::ExodusAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        ),
-                    tree_state(*this, nullptr, "PARAMETER", create_parameter_layout()),
-                    delay()
+                    tree_state(*this, nullptr, "PARAMETER", create_parameter_layout())
 #endif
 {
 }
@@ -86,6 +85,200 @@ void ExodusAudioProcessor::promoteInstence()
 {
     current_instence++;
     current_instence %= NUM_OF_INSTENCES;
+}
+
+
+
+void ExodusAudioProcessor::setSize(int new_num_channels, int new_num_samples)
+{
+    wet_delay_buffer.setSize(new_num_channels, new_num_samples);
+    wet_delay_buffer.setSize(new_num_channels, new_num_samples);
+    delay_buffer_length = wet_delay_buffer.getNumSamples();
+}
+
+void ExodusAudioProcessor::setParameters(const Parameters& new_params)
+{
+    parameters.delay_time = new_params.delay_time;
+    parameters.delay_feedback = new_params.delay_feedback;
+    parameters.delay_mix = new_params.delay_mix;
+}
+
+void ExodusAudioProcessor::setSampleRate(double new_sample_rate)
+{
+    sample_rate = new_sample_rate;
+}
+
+void ExodusAudioProcessor::applyFX(int channel)
+{
+    //applyVolume(channel);
+    //applyDist(channel);
+    //applyReverb(channel);
+    //applyPan(channel);
+}
+
+void ExodusAudioProcessor::applyVolume(int channel)
+{
+    float* channelData = wet_delay_buffer.getWritePointer(channel);
+    for (int sample = 0; sample < wet_delay_buffer.getNumSamples(); ++sample)
+    {
+        channelData[sample] = wet_delay_buffer.getSample(channel, sample) * parameters.delay_volume;
+    }
+}
+
+void ExodusAudioProcessor::applyPan(int channel)
+{
+    float pan_mult = 1;
+    float* channelData = wet_delay_buffer.getWritePointer(channel);
+    if (parameters.delay_pan != 0)
+    {
+        pan_mult = calculatePanMargin(parameters.delay_pan, channel);
+
+        for (int sample = 0; sample < wet_delay_buffer.getNumSamples(); ++sample)
+        {
+            channelData[sample] = wet_delay_buffer.getSample(channel, sample) * pan_mult;
+        }
+    }
+}
+
+void ExodusAudioProcessor::applyReverb(int channel)
+{
+    dsp::AudioBlock<float> audio_block{ wet_delay_buffer };
+    juce::dsp::ProcessContextReplacing<float> ctx(audio_block);
+    reverb.process(ctx);
+}
+
+void ExodusAudioProcessor::applyDist(int channel)
+{
+    distortion.process(wet_delay_buffer, channel);
+}
+
+
+void ExodusAudioProcessor::fillDelayBuffer(int channel, const int buffer_length, const float* read_pointer, int buffer_write_position)
+{
+    if (delay_buffer_length > buffer_length + buffer_write_position)
+    {
+        wet_delay_buffer.copyFromWithRamp(channel, buffer_write_position, read_pointer, buffer_length, parameters.delay_feedback, parameters.delay_feedback);
+        wet_delay_buffer.copyFromWithRamp(channel, buffer_write_position, read_pointer, buffer_length, parameters.delay_feedback, parameters.delay_feedback);
+    }
+    else
+    {
+        const int buffer_remaining = delay_buffer_length - buffer_write_position;
+        wet_delay_buffer.copyFromWithRamp(channel, buffer_write_position, read_pointer, buffer_remaining, parameters.delay_feedback, parameters.delay_feedback);
+        wet_delay_buffer.copyFromWithRamp(channel, buffer_write_position, read_pointer, buffer_remaining, parameters.delay_feedback, parameters.delay_feedback);
+        wet_delay_buffer.copyFromWithRamp(channel, 0, read_pointer, (buffer_length - buffer_remaining), parameters.delay_feedback, parameters.delay_feedback);
+        wet_delay_buffer.copyFromWithRamp(channel, 0, read_pointer, (buffer_length - buffer_remaining), parameters.delay_feedback, parameters.delay_feedback);
+    }
+}
+
+
+void ExodusAudioProcessor::getFromDelayBuffer(AudioBuffer<float>& buffer, int channel, const int buffer_length, const int delay_buffer_length, int buffer_write_position)
+{
+    const int read_position = static_cast<int> (delay_buffer_length + buffer_write_position - (sample_rate * parameters.delay_time / 1000)) % delay_buffer_length;
+    const float* delay_buffer_data = wet_delay_buffer.getReadPointer(channel);
+    //applyFX(channel);
+    //applyReverb(channel);
+    if (delay_buffer_length > buffer_length + read_position)
+    {
+        buffer.addFrom(channel, 0, delay_buffer_data + read_position, buffer_length, powf((parameters.delay_mix / 100), 1.5));  //TODO: change delay mix divider
+    }
+    else
+    {
+        const int buffer_remaining = delay_buffer_length - read_position;
+        buffer.copyFrom(channel, 0, delay_buffer_data + read_position, buffer_remaining, powf((parameters.delay_mix / 100), 1.5));
+        buffer.copyFrom(channel, buffer_remaining, delay_buffer_data, buffer_length - buffer_remaining, powf((parameters.delay_mix / 100), 1.5));
+    }
+}
+
+
+void ExodusAudioProcessor::feedbackDelay(int channel, const int buffer_length, float* write_pointer, int buffer_write_position)
+{
+    if (delay_buffer_length > buffer_length + buffer_write_position)
+    {
+        wet_delay_buffer.addFromWithRamp(channel, buffer_write_position, write_pointer, buffer_length, parameters.delay_feedback, parameters.delay_feedback);
+    }
+    else
+    {
+        const int buffer_remaining = delay_buffer_length - buffer_write_position;
+        wet_delay_buffer.addFromWithRamp(channel, buffer_remaining, write_pointer, buffer_remaining, parameters.delay_feedback, parameters.delay_feedback);
+        wet_delay_buffer.addFromWithRamp(channel, 0, write_pointer, buffer_length - buffer_remaining, parameters.delay_feedback, parameters.delay_feedback);
+    }
+}
+
+
+float ExodusAudioProcessor::calculatePanMargin(float pan, int channel)
+{
+    if (channel == 0)
+    {
+        if (pan < 0)
+        {
+            return 1;
+        }
+        else if (pan > 0)
+        {
+            return 1 - square(pan);
+        }
+    }
+    else if (channel == 1)
+    {
+        if (pan > 0)
+        {
+            return 1;
+        }
+        else if (pan < 0)
+        {
+            return 1 - square(pan);
+        }
+    }
+    return 1;
+}
+
+
+void ExodusAudioProcessor::addOnOffMarked(int instence)
+{
+    d_on_off[instence] = true;
+    on_off_marked++;
+}
+void ExodusAudioProcessor::subOnOffMarked(int instence)
+{
+    d_on_off[instence] = false;
+    on_off_marked--;
+    d_reverb[instence] = false;
+}
+
+bool ExodusAudioProcessor::addReverbMarked(int instence)
+{
+    if (d_on_off[instence] == false)
+    {
+        return false;
+    }
+
+    d_reverb[instence] = true;
+    reverb_marked++;
+    return true;
+}
+bool ExodusAudioProcessor::subReverbMarked(int instence)
+{
+    d_reverb[instence] = false;
+    reverb_marked--;
+    return true;
+}
+
+bool ExodusAudioProcessor::addDistMarked(int instence)
+{
+    if (d_on_off[instence] == false)
+    {
+        return false;
+    }
+
+    d_dist[instence] = true;
+    dist_marked++;
+    return true;
+}
+bool ExodusAudioProcessor::subDistMarked(int instence)
+{
+    d_dist[instence] = false;
+    dist_marked--;
+    return true;
 }
 
 //==============================================================================
@@ -156,15 +349,15 @@ void ExodusAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
     m_visualiser.clear();
     m_visualiser_2.clear();
 
-    delay.setSize(getNumInputChannels(), (sampleRate * samplesPerBlock) * 2);
-    delay.setSampleRate(sampleRate);
-    delay.distortion.setSampleRate(sampleRate);
+    setSize(getNumInputChannels(), (sampleRate * samplesPerBlock) * 2);
+    setSampleRate(sampleRate);
+    distortion.setSampleRate(sampleRate);
 
     dsp::ProcessSpec spec;
     spec.sampleRate = sampleRate;
     spec.maximumBlockSize = static_cast<juce::uint32>(samplesPerBlock);
     spec.numChannels = static_cast<juce::uint32> (getTotalNumOutputChannels());
-    delay.reverb.prepare(spec);
+    reverb.prepare(spec);
 
 }
 
@@ -206,34 +399,34 @@ void ExodusAudioProcessor::updateDelaySettings()
     vol_dial_id.append(to_string(current_instence));
     std::string pan_dial_id = "m_pan_dial_id_";
     pan_dial_id.append(to_string(current_instence));
-    delay_params.delay_mix =        tree_state.getRawParameterValue("m_delay_mix_id")->load();
-    delay_params.delay_time =       tree_state.getRawParameterValue("m_delay_time_id")->load();
-    delay_params.delay_feedback =   tree_state.getRawParameterValue("m_delay_feedback_id")->load();
-    delay_params.delay_volume =     tree_state.getRawParameterValue(vol_dial_id)->load();
-    delay_params.delay_pan =        tree_state.getRawParameterValue(pan_dial_id)->load();
+    parameters.delay_mix =        tree_state.getRawParameterValue("m_delay_mix_id")->load();
+    parameters.delay_time =       tree_state.getRawParameterValue("m_delay_time_id")->load();
+    parameters.delay_feedback =   tree_state.getRawParameterValue("m_delay_feedback_id")->load();
+    parameters.delay_volume =     tree_state.getRawParameterValue(vol_dial_id)->load();
+    parameters.delay_pan =        tree_state.getRawParameterValue(pan_dial_id)->load();
 
-    delay.setParameters(delay_params);
+    setParameters(parameters);
 }
 
 void ExodusAudioProcessor::updateReverbSettings()
 {
-    delay.reverb_params.roomSize = tree_state.getRawParameterValue("m_reverb_room_size_id")->load();
-    delay.reverb_params.damping =  tree_state.getRawParameterValue("m_reverb_damping_id")->load();
-    delay.reverb_params.width =    tree_state.getRawParameterValue("m_reverb_width_id")->load();
-    delay.reverb_params.wetLevel = tree_state.getRawParameterValue("m_reverb_wet_level_id")->load();
-    delay.reverb_params.dryLevel = tree_state.getRawParameterValue("m_reverb_dry_level_id")->load();
+    reverb_params.roomSize = tree_state.getRawParameterValue("m_reverb_room_size_id")->load();
+    reverb_params.damping =  tree_state.getRawParameterValue("m_reverb_damping_id")->load();
+    reverb_params.width =    tree_state.getRawParameterValue("m_reverb_width_id")->load();
+    reverb_params.wetLevel = tree_state.getRawParameterValue("m_reverb_wet_level_id")->load();
+    reverb_params.dryLevel = tree_state.getRawParameterValue("m_reverb_dry_level_id")->load();
 
-    delay.reverb.setParameters(delay.reverb_params);
+    reverb.setParameters(reverb_params);
 }
 
 void ExodusAudioProcessor::updateDistortionSettings()
 {
-    delay.dist_params.dist_drive =        tree_state.getRawParameterValue("m_dist_drive_id")->load();
-    delay.dist_params.dist_brightness =   tree_state.getRawParameterValue("m_dist_brightness_id")->load();
-    delay.dist_params.dist_wet =          tree_state.getRawParameterValue("m_dist_wet_level_id")->load();
-    delay.dist_params.dist_dry =          tree_state.getRawParameterValue("m_dist_dry_level_id")->load();
+    dist_params.dist_drive =        tree_state.getRawParameterValue("m_dist_drive_id")->load();
+    dist_params.dist_brightness =   tree_state.getRawParameterValue("m_dist_brightness_id")->load();
+    dist_params.dist_wet =          tree_state.getRawParameterValue("m_dist_wet_level_id")->load();
+    dist_params.dist_dry =          tree_state.getRawParameterValue("m_dist_dry_level_id")->load();
 
-    delay.distortion.setParameters(delay.dist_params);
+    distortion.setParameters(dist_params);
 }
 
 
@@ -249,8 +442,12 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
+    AudioBuffer<float>& dry_buffer = buffer;
     int buffer_length = buffer.getNumSamples();
-    delay.distortion.setSize(getNumInputChannels(), buffer_length);
+    distortion.setSize(getNumInputChannels(), buffer_length);
+
+    dsp::AudioBlock<float> audio_block{ buffer };
+    juce::dsp::ProcessContextReplacing<float> ctx(audio_block);
 
     m_visualiser.pushBuffer(buffer);
 
@@ -262,12 +459,22 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
             channelData[sample] = channelData[sample] * juce::Decibels::decibelsToGain(tree_state.getRawParameterValue("m_input_gain_id")->load());
         }
 
-        float*       dry_buffer  = buffer.getWritePointer(channel);
-        const float* buffer_data = buffer.getReadPointer(channel);
+        float*       write_pointer  = buffer.getWritePointer(channel);
+        const float* read_pointer = buffer.getReadPointer(channel);
 
-        delay.fillDelayBuffer(channel, buffer_length, buffer_data, processor_buffer_write_pos);
-        delay.getFromDelayBuffer(buffer, channel, buffer_length, delay.getNumSamples(), processor_buffer_write_pos);
-        delay.feedbackDelay(channel, buffer_length, dry_buffer, processor_buffer_write_pos);
+        //fillDelayBuffer(channel, buffer_length, read_pointer, processor_buffer_write_pos);
+        //getFromDelayBuffer(buffer, channel, buffer_length, getNumSamples(), processor_buffer_write_pos);
+        //feedbackDelay(channel, buffer_length, write_pointer, processor_buffer_write_pos);
+        if (d_reverb[current_instence] == true)
+        {
+            reverb.process(ctx);
+        }
+        if (d_dist[current_instence] == true)
+        {
+            distortion.process(buffer, channel);
+        }
+
+
     }
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
@@ -275,13 +482,13 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
         auto* channelData = buffer.getWritePointer(channel);
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
         {
-            channelData[sample] = channelData[sample] * juce::Decibels::decibelsToGain(tree_state.getRawParameterValue("m_output_gain_id")->load()) * delay_params.delay_volume;
+            channelData[sample] = channelData[sample] * juce::Decibels::decibelsToGain(tree_state.getRawParameterValue("m_output_gain_id")->load()) * parameters.delay_volume;
         }
     }
     m_visualiser_2.pushBuffer(buffer);
     
     processor_buffer_write_pos += buffer_length;
-    processor_buffer_write_pos %= delay.getNumSamples();
+    processor_buffer_write_pos %= getNumSamples();
 }
 
 

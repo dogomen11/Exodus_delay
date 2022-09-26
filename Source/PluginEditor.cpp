@@ -80,43 +80,43 @@ void ExodusAudioProcessorEditor::buttonClicked(Button* button)
     {
         if (button == &m_on_off_buttons[i])
         {
-            audioProcessor.delay.d_on_off[i] = m_on_off_buttons[i].getToggleState();
+            audioProcessor.d_on_off[i] = m_on_off_buttons[i].getToggleState();
             switch (m_on_off_buttons[i].getToggleState())
             {
             case true:
-                audioProcessor.delay.addOnOffMarked(i);
+                audioProcessor.addOnOffMarked(i);
                 break;
             case false:
-                audioProcessor.delay.subOnOffMarked(i);
+                audioProcessor.subOnOffMarked(i);
                 break;
             }
         }
         else if (button == &m_reverb_buttons[i])
         {
-            audioProcessor.delay.d_reverb[i] = m_reverb_buttons[i].getToggleState();
+            audioProcessor.d_reverb[i] = m_reverb_buttons[i].getToggleState();
             switch (m_reverb_buttons[i].getToggleState())
             {
             case true:
-                if (audioProcessor.delay.addReverbMarked(i) == false)
+                if (audioProcessor.addReverbMarked(i) == false)
                     m_reverb_buttons[i].setToggleState(false, true);
                 break;
             case false:
-                audioProcessor.delay.subReverbMarked(i);
+                audioProcessor.subReverbMarked(i);
                 break;
             }
         }
         else if (button == &m_dist_buttons[i])
         {
-            audioProcessor.delay.d_dist[i] = m_dist_buttons[i].getToggleState();
+            audioProcessor.d_dist[i] = m_dist_buttons[i].getToggleState();
             switch (m_dist_buttons[i].getToggleState())
             {
             case true:
-                if (audioProcessor.delay.addDistMarked(i) == false)
+                if (audioProcessor.addDistMarked(i) == false)
                     m_dist_buttons[i].setToggleState(false, true);
                 
                 break;
             case false:
-                audioProcessor.delay.subDistMarked(i);
+                audioProcessor.subDistMarked(i);
                 break;
             }
         }
@@ -129,7 +129,7 @@ void ExodusAudioProcessorEditor::reAlphaComponents()
 {
     for (int i = 0; i < 16; i++)
     {
-        if (audioProcessor.delay.getOnOffMarked() == 0)
+        if (audioProcessor.getOnOffMarked() == 0)
         {
             m_volume_dials[i].setAlpha(TRANSPARENT);
             m_pan_dials[i].setAlpha(TRANSPARENT);
@@ -329,12 +329,12 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
     {
         addAndMakeVisible(m_volume_dials[i]);
         m_volume_dials[i].setRange(0.0f, 1.5f, 0.01f);
-        m_volume_dials[i].setValue(1.0f);
         m_input_gain.setSkewFactorFromMidPoint(1.0f);
+        m_volume_dials[i].setValue(1.0f);
         m_volume_dials[i].setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
         m_volume_dials[i].setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
         m_volume_dials[i].setOpaque(false);
-        if (audioProcessor.delay.getOnOffMarked() == 0) { m_volume_dials[i].setAlpha(TRANSPARENT); }
+        if (audioProcessor.getOnOffMarked() == 0) { m_volume_dials[i].setAlpha(TRANSPARENT); }
 
         addAndMakeVisible(m_pan_dials[i]);
         m_pan_dials[i].setRange(-1.0f, 1.0f, 0.01f);
@@ -342,19 +342,19 @@ void ExodusAudioProcessorEditor::initiateComponents(AudioProcessor& p)
         m_pan_dials[i].setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
         m_pan_dials[i].setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
         m_pan_dials[i].setOpaque(false);
-        if (audioProcessor.delay.getOnOffMarked() == 0) { m_pan_dials[i].setAlpha(TRANSPARENT); }
+        if (audioProcessor.getOnOffMarked() == 0) { m_pan_dials[i].setAlpha(TRANSPARENT); }
 
         addAndMakeVisible(m_on_off_buttons[i]);
         m_on_off_buttons[i].addListener(this);
-        if (audioProcessor.delay.getOnOffMarked() == 0) { m_on_off_buttons[i].setAlpha(TRANSPARENT); }
+        if (audioProcessor.getOnOffMarked() == 0) { m_on_off_buttons[i].setAlpha(TRANSPARENT); }
 
         addAndMakeVisible(m_reverb_buttons[i]);
         m_reverb_buttons[i].addListener(this);
-        if (audioProcessor.delay.getOnOffMarked() == 0) { m_reverb_buttons[i].setAlpha(TRANSPARENT); }
+        if (audioProcessor.getOnOffMarked() == 0) { m_reverb_buttons[i].setAlpha(TRANSPARENT); }
 
         addAndMakeVisible(m_dist_buttons[i]);
         m_dist_buttons[i].addListener(this);
-        if (audioProcessor.delay.getOnOffMarked() == 0) { m_dist_buttons[i].setAlpha(TRANSPARENT); }
+        if (audioProcessor.getOnOffMarked() == 0) { m_dist_buttons[i].setAlpha(TRANSPARENT); }
     }
 
     instence_indicator.setColour(0xffffe4c4, Colours::bisque);

@@ -83,20 +83,20 @@ void MyDelay::applyDist(int channel)
 }
 
 
-void MyDelay::fillDelayBuffer(int channel, const int buffer_length, const float* buffer_data, int buffer_write_position)
+void MyDelay::fillDelayBuffer(int channel, const int buffer_length, const float* read_pointer, int buffer_write_position)
 {
     if (delay_buffer_length > buffer_length + buffer_write_position)
     {
-        dry_delay_buffer.copyFromWithRamp(channel, buffer_write_position, buffer_data, buffer_length, parameters.delay_feedback, parameters.delay_feedback);
-        wet_delay_buffer.copyFromWithRamp(channel, buffer_write_position, buffer_data, buffer_length, parameters.delay_feedback, parameters.delay_feedback);
+        dry_delay_buffer.copyFromWithRamp(channel, buffer_write_position, read_pointer, buffer_length, parameters.delay_feedback, parameters.delay_feedback);
+        wet_delay_buffer.copyFromWithRamp(channel, buffer_write_position, read_pointer, buffer_length, parameters.delay_feedback, parameters.delay_feedback);
     }
     else
     {
         const int buffer_remaining = delay_buffer_length - buffer_write_position;
-        dry_delay_buffer.copyFromWithRamp(channel, buffer_write_position, buffer_data, buffer_remaining, parameters.delay_feedback, parameters.delay_feedback);
-        wet_delay_buffer.copyFromWithRamp(channel, buffer_write_position, buffer_data, buffer_remaining, parameters.delay_feedback, parameters.delay_feedback);
-        dry_delay_buffer.copyFromWithRamp(channel, 0, buffer_data, (buffer_length - buffer_remaining), parameters.delay_feedback, parameters.delay_feedback);
-        wet_delay_buffer.copyFromWithRamp(channel, 0, buffer_data, (buffer_length - buffer_remaining), parameters.delay_feedback, parameters.delay_feedback);
+        dry_delay_buffer.copyFromWithRamp(channel, buffer_write_position, read_pointer, buffer_remaining, parameters.delay_feedback, parameters.delay_feedback);
+        wet_delay_buffer.copyFromWithRamp(channel, buffer_write_position, read_pointer, buffer_remaining, parameters.delay_feedback, parameters.delay_feedback);
+        dry_delay_buffer.copyFromWithRamp(channel, 0, read_pointer, (buffer_length - buffer_remaining), parameters.delay_feedback, parameters.delay_feedback);
+        wet_delay_buffer.copyFromWithRamp(channel, 0, read_pointer, (buffer_length - buffer_remaining), parameters.delay_feedback, parameters.delay_feedback);
     }
 }
 
@@ -120,17 +120,17 @@ void MyDelay::getFromDelayBuffer(AudioBuffer<float>& buffer, int channel, const 
 }
 
 
-void MyDelay::feedbackDelay(int channel, const int buffer_length, float* dry_buffer, int buffer_write_position)
+void MyDelay::feedbackDelay(int channel, const int buffer_length, float* write_pointer, int buffer_write_position)
 {
     if (delay_buffer_length > buffer_length + buffer_write_position)
     {
-        dry_delay_buffer.addFromWithRamp(channel, buffer_write_position, dry_buffer, buffer_length, parameters.delay_feedback, parameters.delay_feedback);
+        dry_delay_buffer.addFromWithRamp(channel, buffer_write_position, write_pointer, buffer_length, parameters.delay_feedback, parameters.delay_feedback);
     }
     else
     {
         const int buffer_remaining = delay_buffer_length - buffer_write_position;
-        dry_delay_buffer.addFromWithRamp(channel, buffer_remaining, dry_buffer, buffer_remaining, parameters.delay_feedback, parameters.delay_feedback);
-        dry_delay_buffer.addFromWithRamp(channel, 0, dry_buffer, buffer_length - buffer_remaining, parameters.delay_feedback, parameters.delay_feedback);
+        dry_delay_buffer.addFromWithRamp(channel, buffer_remaining, write_pointer, buffer_remaining, parameters.delay_feedback, parameters.delay_feedback);
+        dry_delay_buffer.addFromWithRamp(channel, 0, write_pointer, buffer_length - buffer_remaining, parameters.delay_feedback, parameters.delay_feedback);
     }
 }
 

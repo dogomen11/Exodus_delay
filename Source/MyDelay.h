@@ -31,8 +31,6 @@ class MyDelay
             float delay_volume = 1.0f;
             float delay_pan = 0.0f;
         };
-
-    private:
         AudioBuffer<float> dry_delay_buffer, wet_delay_buffer;
         int delay_buffer_length;
         double sample_rate;
@@ -40,8 +38,6 @@ class MyDelay
         int reverb_marked = INSTENCE_OFF;
         int dist_marked = INSTENCE_OFF;
         Parameters parameters;
-        
-    public:
         bool d_on_off[NUM_OF_INSTENCES] = { INSTENCE_OFF };
         bool d_reverb[NUM_OF_INSTENCES] = { INSTENCE_OFF };
         bool d_dist[NUM_OF_INSTENCES] = { INSTENCE_OFF };
@@ -55,9 +51,9 @@ class MyDelay
         void setSampleRate(double new_sample_rate);
         void setSize(int new_num_channels, int new_num_samples);
         void setParameters(const Parameters& new_params);
-        void fillDelayBuffer(int channel, const int buffer_length, const float* buffer_data, int buffer_write_position);
+        void fillDelayBuffer(int channel, const int buffer_length, const float* read_pointer, int buffer_write_position);
         void getFromDelayBuffer(AudioBuffer<float>& buffer, int channel, const int buffer_length, const int delay_buffer_length, int buffer_write_position);
-        void feedbackDelay(int channel, const int buffer_length, float* dry_buffer, int buffer_write_position);
+        void feedbackDelay(int channel, const int buffer_length, float* write_pointer, int buffer_write_position);
         void applyFX(int channel);
         void applyPan(int channel);
         void applyVolume(int channel);
