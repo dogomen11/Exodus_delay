@@ -20,7 +20,9 @@ ExodusAudioProcessor::ExodusAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        ),
-                    tree_state(*this, nullptr, "PARAMETER", create_parameter_layout())
+                    tree_state(*this, nullptr, "PARAMETER", create_parameter_layout()),
+                    reverb(), 
+                    distortion()
 #endif
 {
 }
@@ -87,11 +89,8 @@ void ExodusAudioProcessor::promoteInstence()
     current_instence %= NUM_OF_INSTENCES;
 }
 
-
-
 void ExodusAudioProcessor::setSize(int new_num_channels, int new_num_samples)
 {
-    wet_delay_buffer.setSize(new_num_channels, new_num_samples);
     wet_delay_buffer.setSize(new_num_channels, new_num_samples);
     delay_buffer_length = wet_delay_buffer.getNumSamples();
 }

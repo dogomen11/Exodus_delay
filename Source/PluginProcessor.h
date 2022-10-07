@@ -92,7 +92,6 @@ public:
         float delay_pan = 0.0f;
     };
 
-
     Visualiser m_visualiser;
     Visualiser m_visualiser_2;
     AudioBuffer<float> wet_delay_buffer;
@@ -129,17 +128,17 @@ public:
     void applyReverb(int channel);
     void applyDist(int channel);
     float calculatePanMargin(float pan, int channel);
-    int getOnOffMarked() { return on_off_marked; }
-    int getReverbMarked() { return reverb_marked; }
-    int getNumSamples() { return wet_delay_buffer.getNumSamples(); }
-    float getDelayTime() { return parameters.delay_time; }
-    float getDelayMix() { return parameters.delay_mix; }
     void addOnOffMarked(int instence);
     void subOnOffMarked(int instence);
     bool addReverbMarked(int instence);
     bool subReverbMarked(int instence);
     bool addDistMarked(int instence);
     bool subDistMarked(int instence);
+    int getOnOffMarked() { return on_off_marked; }
+    int getReverbMarked() { return reverb_marked; }
+    int getNumSamples() { return wet_delay_buffer.getNumSamples(); }
+    float getDelayTime() { return parameters.delay_time; }
+    float getDelayMix() { return parameters.delay_mix; }
 
 private:
     //==============================================================================
