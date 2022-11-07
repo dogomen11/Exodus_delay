@@ -90,6 +90,7 @@ public:
         float delay_feedback = 0.33f;
         float delay_volume = 1.0f;
         float delay_pan = 0.0f;
+        float app_delay_pan = 0.0f;
     };
 
     Visualiser m_visualiser;
@@ -101,16 +102,16 @@ public:
     MyDistortion distortion;
     MyDistortion::Parameters dist_params;
 
-    int current_instence = 0;
-    int processor_buffer_write_pos = 0;
+    int current_instence;
+    int processor_buffer_write_pos;
     int delay_buffer_length;
     double sample_rate;
-    int on_off_marked = INSTENCE_OFF;
-    int reverb_marked = INSTENCE_OFF;
-    int dist_marked = INSTENCE_OFF;
-    bool d_on_off[NUM_OF_INSTENCES] = { INSTENCE_OFF };
-    bool d_reverb[NUM_OF_INSTENCES] = { INSTENCE_OFF };
-    bool d_dist[NUM_OF_INSTENCES] = { INSTENCE_OFF };
+    int on_off_marked;
+    int reverb_marked;
+    int dist_marked;
+    bool d_on_off[NUM_OF_INSTENCES];
+    bool d_reverb[NUM_OF_INSTENCES];
+    bool d_dist[NUM_OF_INSTENCES];
 
     void setSampleRate(double new_sample_rate);
     void setSize(int new_num_channels, int new_num_samples);
@@ -122,12 +123,11 @@ public:
     void updateReverbSettings();
     void updateDistortionSettings();
     void promoteInstence();
-    void applyFX(int channel);
     void applyPan(int channel);
     void applyVolume(int channel);
     void applyReverb(int channel);
     void applyDist(int channel);
-    float calculatePanMargin(float pan, int channel);
+    float calculatePanMargin(int channel);
     void addOnOffMarked(int instence);
     void subOnOffMarked(int instence);
     bool addReverbMarked(int instence);

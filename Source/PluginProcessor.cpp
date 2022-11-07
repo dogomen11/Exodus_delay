@@ -22,7 +22,10 @@ ExodusAudioProcessor::ExodusAudioProcessor()
                        ),
                     tree_state(*this, nullptr, "PARAMETER", create_parameter_layout()),
                     reverb(), 
-                    distortion()
+                    distortion(),
+                    current_instence(0), processor_buffer_write_pos(0),
+                    on_off_marked(INSTENCE_OFF), reverb_marked(INSTENCE_OFF), dist_marked(INSTENCE_OFF),
+                    d_on_off{ INSTENCE_OFF }, d_reverb{ INSTENCE_OFF }, d_dist{ INSTENCE_OFF }
 #endif
 {
 }
@@ -107,20 +110,17 @@ void ExodusAudioProcessor::setSampleRate(double new_sample_rate)
     sample_rate = new_sample_rate;
 }
 
-void ExodusAudioProcessor::applyFX(int channel)
-{
-    //applyVolume(channel);
-    //applyDist(channel);
-    //applyReverb(channel);
-    //applyPan(channel);
-}
-
 void ExodusAudioProcessor::applyVolume(int channel)
 {
     float* channelData = wet_delay_buffer.getWritePointer(channel);
-    for (int sample = 0; sample < wet_delay_buffer.getNumSamples(); ++sample)
+    float pan_mult = 1;
+    if (parameters.delay_pan != 0)
     {
-        channelData[sample] = wet_delay_buffer.getSample(channel, sample) * parameters.delay_volume;
+        pan_mult = calculatePanMargin(channel);
+    }
+    //for (int sample = 0; sample < wet_delay_buffer.getNumSamples(); ++sample)
+    {
+        //channelData[sample] = wet_delay_buffer.getSample(channel, sample) * parameters.delay_volume * pan_mult;
     }
 }
 
@@ -130,7 +130,7 @@ void ExodusAudioProcessor::applyPan(int channel)
     float* channelData = wet_delay_buffer.getWritePointer(channel);
     if (parameters.delay_pan != 0)
     {
-        pan_mult = calculatePanMargin(parameters.delay_pan, channel);
+        pan_mult = calculatePanMargin(channel);
 
         for (int sample = 0; sample < wet_delay_buffer.getNumSamples(); ++sample)
         {
@@ -174,17 +174,16 @@ void ExodusAudioProcessor::getFromDelayBuffer(AudioBuffer<float>& buffer, int ch
 {
     const int read_position = static_cast<int> (delay_buffer_length + buffer_write_position - (sample_rate * parameters.delay_time / 1000)) % delay_buffer_length;
     const float* delay_buffer_data = wet_delay_buffer.getReadPointer(channel);
-    //applyFX(channel);
-    //applyReverb(channel);
+    parameters.app_delay_pan = calculatePanMargin(channel);
     if (delay_buffer_length > buffer_length + read_position)
     {
-        buffer.addFrom(channel, 0, delay_buffer_data + read_position, buffer_length, powf((parameters.delay_mix / 100), 1.5));  //TODO: change delay mix divider
+        buffer.addFrom(channel, 0, delay_buffer_data + read_position, buffer_length, parameters.app_delay_pan * powf((parameters.delay_mix / 100), 1.5));  //TODO: change delay mix divider
     }
     else
     {
         const int buffer_remaining = delay_buffer_length - read_position;
-        buffer.copyFrom(channel, 0, delay_buffer_data + read_position, buffer_remaining, powf((parameters.delay_mix / 100), 1.5));
-        buffer.copyFrom(channel, buffer_remaining, delay_buffer_data, buffer_length - buffer_remaining, powf((parameters.delay_mix / 100), 1.5));
+        buffer.copyFrom(channel, 0, delay_buffer_data + read_position, buffer_remaining, parameters.app_delay_pan * powf((parameters.delay_mix / 100), 1.5));
+        buffer.copyFrom(channel, buffer_remaining, delay_buffer_data, buffer_length - buffer_remaining, parameters.app_delay_pan * powf((parameters.delay_mix / 100), 1.5));
     }
 }
 
@@ -204,28 +203,28 @@ void ExodusAudioProcessor::feedbackDelay(int channel, const int buffer_length, f
 }
 
 
-float ExodusAudioProcessor::calculatePanMargin(float pan, int channel)
+float ExodusAudioProcessor::calculatePanMargin(int channel)
 {
     if (channel == 0)
     {
-        if (pan < 0)
+        if (parameters.delay_pan < 0)
         {
             return 1;
         }
-        else if (pan > 0)
+        else if (parameters.delay_pan > 0)
         {
-            return 1 - square(pan);
+            return 1 - square(parameters.delay_pan);
         }
     }
     else if (channel == 1)
     {
-        if (pan > 0)
+        if (parameters.delay_pan > 0)
         {
             return 1;
         }
-        else if (pan < 0)
+        else if (parameters.delay_pan < 0)
         {
-            return 1 - square(pan);
+            return 1 - square(parameters.delay_pan);
         }
     }
     return 1;
@@ -246,10 +245,10 @@ void ExodusAudioProcessor::subOnOffMarked(int instence)
 
 bool ExodusAudioProcessor::addReverbMarked(int instence)
 {
-    if (d_on_off[instence] == false)
-    {
-        return false;
-    }
+    //if (d_on_off[instence] == false)
+    //{
+    //    return false;
+    //}
 
     d_reverb[instence] = true;
     reverb_marked++;
@@ -264,10 +263,10 @@ bool ExodusAudioProcessor::subReverbMarked(int instence)
 
 bool ExodusAudioProcessor::addDistMarked(int instence)
 {
-    if (d_on_off[instence] == false)
-    {
-        return false;
-    }
+    //if (d_on_off[instence] == false)
+    //{
+    //    return false;
+    //}
 
     d_dist[instence] = true;
     dist_marked++;
@@ -428,6 +427,16 @@ void ExodusAudioProcessor::updateDistortionSettings()
     distortion.setParameters(dist_params);
 }
 
+//   ▄███████▄    ▄████████  ▄██████▄   ▄████████    ▄████████    ▄████████    ▄████████  ▄██████▄     ▄████████ 
+//  ███    ███   ███    ███ ███    ███ ███    ███   ███    ███   ███    ███   ███    ███ ███    ███   ███    ███ 
+//  ███    ███   ███    ███ ███    ███ ███    █▀    ███    █▀    ███    █▀    ███    █▀  ███    ███   ███    ███ 
+//  ███    ███  ▄███▄▄▄▄██▀ ███    ███ ███         ▄███▄▄▄       ███          ███        ███    ███  ▄███▄▄▄▄██▀ 
+//▀█████████▀  ▀▀███▀▀▀▀▀   ███    ███ ███        ▀▀███▀▀▀     ▀███████████ ▀███████████ ███    ███ ▀▀███▀▀▀▀▀   
+//  ███        ▀███████████ ███    ███ ███    █▄    ███    █▄           ███          ███ ███    ███ ▀███████████ 
+//  ███          ███    ███ ███    ███ ███    ███   ███    ███    ▄█    ███    ▄█    ███ ███    ███   ███    ███ 
+// ▄████▀        ███    ███  ▀██████▀  ████████▀    ██████████  ▄████████▀   ▄████████▀   ▀██████▀    ███    ███ 
+//               ███    ███                                                                           ███    ███ 
+
 
 void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
@@ -441,9 +450,8 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    AudioBuffer<float>& dry_buffer = buffer;
     int buffer_length = buffer.getNumSamples();
-    distortion.setSize(getNumInputChannels(), buffer_length);
+    distortion.setSize(getNumInputChannels(), delay_buffer_length);
 
     dsp::AudioBlock<float> audio_block{ buffer };
     juce::dsp::ProcessContextReplacing<float> ctx(audio_block);
@@ -458,22 +466,26 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
             channelData[sample] = channelData[sample] * juce::Decibels::decibelsToGain(tree_state.getRawParameterValue("m_input_gain_id")->load());
         }
 
-        float*       write_pointer  = buffer.getWritePointer(channel);
-        const float* read_pointer = buffer.getReadPointer(channel);
+        float*       write_pointer = buffer.getWritePointer(channel);
+        const float* read_pointer  = buffer.getReadPointer(channel);
 
-        //fillDelayBuffer(channel, buffer_length, read_pointer, processor_buffer_write_pos);
-        //getFromDelayBuffer(buffer, channel, buffer_length, getNumSamples(), processor_buffer_write_pos);
-        //feedbackDelay(channel, buffer_length, write_pointer, processor_buffer_write_pos);
-        if (d_reverb[current_instence] == true)
+        fillDelayBuffer(channel, buffer_length, read_pointer, processor_buffer_write_pos);
+        
+        if (d_on_off[current_instence] == true)
         {
-            reverb.process(ctx);
+            //if (d_reverb[current_instence] == true)
+            {
+                //reverb.process(ctx);
+            }
+            if (d_dist[current_instence] == true)
+            {
+                distortion.process(wet_delay_buffer, channel);
+            }
+            //getFromDelayBuffer(buffer, channel, buffer_length, getNumSamples(), processor_buffer_write_pos);
+            //feedbackDelay(channel, buffer_length, write_pointer, processor_buffer_write_pos);
         }
-        if (d_dist[current_instence] == true)
-        {
-            distortion.process(buffer, channel);
-        }
-
-
+        getFromDelayBuffer(buffer, channel, buffer_length, getNumSamples(), processor_buffer_write_pos);
+        feedbackDelay(channel, buffer_length, write_pointer, processor_buffer_write_pos);
     }
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
