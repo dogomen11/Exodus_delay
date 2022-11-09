@@ -95,7 +95,7 @@ public:
 
     Visualiser m_visualiser;
     Visualiser m_visualiser_2;
-    AudioBuffer<float> wet_delay_buffer;
+    AudioBuffer<float> wet_delay_buffer, dry_delay_buffer;
     Parameters parameters;
     dsp::Reverb reverb;
     dsp::Reverb::Parameters reverb_params;

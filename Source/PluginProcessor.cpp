@@ -95,6 +95,7 @@ void ExodusAudioProcessor::promoteInstence()
 void ExodusAudioProcessor::setSize(int new_num_channels, int new_num_samples)
 {
     wet_delay_buffer.setSize(new_num_channels, new_num_samples);
+    dry_delay_buffer.setSize(new_num_channels, new_num_samples);
     delay_buffer_length = wet_delay_buffer.getNumSamples();
 }
 
@@ -481,8 +482,6 @@ void ExodusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
             {
                 distortion.process(wet_delay_buffer, channel);
             }
-            //getFromDelayBuffer(buffer, channel, buffer_length, getNumSamples(), processor_buffer_write_pos);
-            //feedbackDelay(channel, buffer_length, write_pointer, processor_buffer_write_pos);
         }
         getFromDelayBuffer(buffer, channel, buffer_length, getNumSamples(), processor_buffer_write_pos);
         feedbackDelay(channel, buffer_length, write_pointer, processor_buffer_write_pos);
