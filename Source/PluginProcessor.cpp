@@ -145,7 +145,7 @@ void ExodusAudioProcessor::fillDelayBuffers(int channel, const int buffer_length
 void ExodusAudioProcessor::getFromDelayBuffer(AudioBuffer<float>& buffer, int channel, const int buffer_length, const int delay_buffer_length, int buffer_write_position)
 {
     const int read_position = static_cast<int> (delay_buffer_length + buffer_write_position - (sample_rate * parameters.delay_time / 1000)) % delay_buffer_length;
-    const float* wet_delay_buffer_data = wet_delay_buffer.getReadPointer(channel);
+    const float* wet_delay_buffer_data = dry_delay_buffer.getReadPointer(channel);
     parameters.app_delay_pan = calculatePanMargin(channel);
     if (delay_buffer_length > buffer_length + read_position)
     {
